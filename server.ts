@@ -31,6 +31,7 @@ db.exec(`
     bio TEXT,
     image_url TEXT,
     is_founder INTEGER DEFAULT 0,
+    has_star INTEGER DEFAULT 0,
     joined_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
@@ -80,8 +81,8 @@ async function startServer() {
 
       if (moderation_status === 'accepted') {
         const app = db.prepare("SELECT * FROM applications WHERE id = ?").get() as any;
-        const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url) VALUES (?, ?, ?, ?)");
-        insertMember.run(app.name, app.role, app.contribution, `https://picsum.photos/seed/${app.name}/400/400`);
+        const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url, has_star) VALUES (?, ?, ?, ?, ?)");
+        insertMember.run(app.name, app.role, app.contribution, `https://picsum.photos/seed/${app.name}/400/400`, 1);
       }
 
       res.json({ success: true });

@@ -28,7 +28,10 @@ import {
   Info,
   ChevronRight,
   LogOut,
-  Bot
+  Bot,
+  Star,
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
@@ -36,7 +39,7 @@ import { cn } from './lib/utils';
 import { translations } from './translations';
 
 export default function App() {
-  const [view, setView] = useState<'landing' | 'community' | 'founders'>('landing');
+  const [view, setView] = useState<'landing' | 'community' | 'founders' | 'members'>('landing');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
@@ -198,11 +201,8 @@ export default function App() {
             </button>
             {view === 'landing' && (
               <button 
-                onClick={() => {
-                  const el = document.getElementById('members-section');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="hidden md:flex bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-zinc-700"
+                onClick={() => setView('members')}
+                className="hidden sm:flex bg-zinc-800/50 hover:bg-zinc-800 text-zinc-400 hover:text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-zinc-700"
               >
                 <Users size={14} className="mr-2" />
                 {t.report.communityPortal.foundersPortal.members.title}
@@ -217,6 +217,14 @@ export default function App() {
               </button>
             )}
             {view === 'community' && (
+              <button 
+                onClick={() => setView('landing')}
+                className="bg-white/10 hover:bg-white/20 text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
+              >
+                {t.report.communityPortal.onboarding.back}
+              </button>
+            )}
+            {view === 'members' && (
               <button 
                 onClick={() => setView('landing')}
                 className="bg-white/10 hover:bg-white/20 text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
@@ -590,6 +598,13 @@ export default function App() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-2">{t.report.solution.labels.model}</p>
                     <p className="text-sm text-zinc-400">{t.report.solution.community.model}</p>
                   </div>
+                  <button 
+                    onClick={() => setView('members')}
+                    className="w-full mt-4 py-3 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-xl border border-cyan-500/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Users size={14} />
+                    {t.report.communityPortal.foundersPortal.members.title}
+                  </button>
                 </div>
               </div>
             </div>
@@ -914,9 +929,6 @@ export default function App() {
           </div>
         </motion.section>
 
-        {/* Members Section */}
-        <MembersSection t={t} members={members} />
-
         {/* Recap Section */}
         <motion.section 
           initial={{ opacity: 0, y: 40 }}
@@ -1018,6 +1030,19 @@ export default function App() {
   )}
   {view === 'community' && (
     <CommunityPortal lang={lang} t={t} onBack={() => setView('landing')} />
+  )}
+  {view === 'members' && (
+    <div className="pt-20 pb-32">
+      <MembersSection t={t} members={members} />
+      <div className="text-center mt-12">
+        <button 
+          onClick={() => setView('landing')}
+          className="bg-zinc-800 hover:bg-zinc-700 text-white px-8 py-3 rounded-full text-sm font-bold transition-all border border-zinc-700"
+        >
+          {t.report.communityPortal.onboarding.back}
+        </button>
+      </div>
+    </div>
   )}
   {view === 'founders' && (
     <FoundersPortal t={t} onBack={() => setView('landing')} />
@@ -1224,161 +1249,229 @@ function CommunityPortal({ lang, t, onBack }: { lang: 'fr' | 'en', t: any, onBac
 return (
 <div className="min-h-[90vh] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
 {/* Background elements */}
-<div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-  <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" />
+<div className="absolute inset-0 pointer-events-none">
+  <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" />
+  <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px] animate-pulse" />
+  <div 
+    className="absolute inset-0 opacity-[0.03]"
+    style={{
+      backgroundImage: `radial-gradient(#22d3ee 0.5px, transparent 0.5px)`,
+      backgroundSize: '24px 24px',
+    }}
+  />
 </div>
 
 <motion.div 
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
   className="max-w-4xl w-full z-10"
 >
   {step === 0 ? (
     <div className="text-center">
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-8">
-        <Users className="text-cyan-400" size={16} />
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-8"
+      >
+        <Sparkles className="text-cyan-400" size={16} />
         <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">{t.report.communityPortal.hero.tag}</span>
-      </div>
-      <h1 className="text-4xl md:text-7xl font-bold text-white mb-8 tracking-tighter leading-tight">
+      </motion.div>
+      <motion.h1 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="text-4xl md:text-8xl font-bold text-white mb-8 tracking-tighter leading-[0.9]"
+      >
         {t.report.communityPortal.hero.title}
-      </h1>
-      <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto font-light">
+      </motion.h1>
+      <motion.p 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-lg md:text-2xl text-zinc-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed"
+      >
         {t.report.communityPortal.hero.desc}
-      </p>
+      </motion.p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <motion.div 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+      >
         {[t.report.communityPortal.future.vision1, t.report.communityPortal.future.vision2, t.report.communityPortal.future.vision3].map((v, i) => (
-          <div key={i} className="p-6 bg-zinc-900/50 rounded-2xl border border-zinc-800 text-left hover:border-cyan-500/30 transition-all">
-            <p className="text-sm text-zinc-300 leading-relaxed">{v}</p>
+          <div key={i} className="p-8 bg-zinc-900/40 backdrop-blur-md rounded-3xl border border-zinc-800/50 text-left hover:border-cyan-500/30 transition-all group">
+            <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center mb-4 group-hover:bg-cyan-500 group-hover:text-zinc-950 transition-all">
+              <CheckCircle2 size={14} />
+            </div>
+            <p className="text-xs md:text-sm text-zinc-300 leading-relaxed font-medium">{v}</p>
           </div>
         ))}
-      </div>
+      </motion.div>
 
-      <button 
+      <motion.button 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setStep(1)}
-        className="bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-8 py-4 rounded-full text-sm font-bold transition-all shadow-xl shadow-cyan-500/20 flex items-center gap-3 mx-auto"
+        className="bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest transition-all shadow-2xl shadow-cyan-500/40 flex items-center gap-3 mx-auto"
       >
         {t.report.communityPortal.onboarding.start}
         <ArrowRight size={18} />
-      </button>
+      </motion.button>
     </div>
   ) : (
-    <div className="max-w-2xl mx-auto bg-zinc-900/50 backdrop-blur-md rounded-[2.5rem] border border-zinc-800 p-8 md:p-12 shadow-2xl">
-      <div className="flex items-center gap-4 mb-12">
-        <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20">
-          <Bot className="text-cyan-400" size={24} />
-        </div>
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">{t.report.communityPortal.onboarding.aiName}</h2>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.chat.status}</p>
-        </div>
+    <div className="max-w-2xl mx-auto">
+      {/* Progress Bar */}
+      <div className="w-full h-1 bg-zinc-800 rounded-full mb-8 overflow-hidden">
+        <motion.div 
+          initial={{ width: 0 }}
+          animate={{ width: `${(step / 13) * 100}%` }}
+          className="h-full bg-cyan-500 shadow-[0_0_10px_#22d3ee]"
+        />
       </div>
 
-      <div className="space-y-8 mb-12 min-h-[200px]">
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-4"
-          >
-            {feedback && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-cyan-500/10 border border-cyan-500/20 p-4 rounded-2xl text-cyan-400 text-xs italic"
-              >
-                "{feedback}"
-              </motion.div>
-            )}
-
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl text-red-400 text-xs"
-              >
-                {error}
-              </motion.div>
-            )}
-
-            <div className="bg-zinc-800/50 p-6 rounded-2xl rounded-tl-none border border-zinc-700 text-zinc-200">
-              {step === -1 && (
-                <div className="space-y-4">
-                  <p>{t.report.communityPortal.onboarding.browseNo}</p>
-                  <button 
-                    onClick={onBack}
-                    className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-bold uppercase tracking-widest text-[10px]"
-                  >
-                    <ArrowRight className="rotate-180" size={14} />
-                    {t.report.communityPortal.onboarding.browseBack}
-                  </button>
-                </div>
-              )}
-              {step === 1 && (
-                <div className="space-y-4">
-                  <p className="text-cyan-400 font-medium italic">{t.report.communityPortal.onboarding.aiIntro}</p>
-                  <p>{t.report.communityPortal.onboarding.humanCheck}</p>
-                </div>
-              )}
-              {step === 2 && t.report.communityPortal.onboarding.cameroonCheck}
-              {step === 3 && t.report.communityPortal.onboarding.browseCheck}
-              {step === 4 && t.report.communityPortal.onboarding.understandingQ}
-              {step === 5 && t.report.communityPortal.onboarding.q1}
-              {step === 6 && t.report.communityPortal.onboarding.q2}
-              {step === 7 && t.report.communityPortal.onboarding.q2_student_school}
-              {step === 8 && t.report.communityPortal.onboarding.q2_student_major}
-              {step === 9 && t.report.communityPortal.onboarding.q2_student_level}
-              {step === 10 && t.report.communityPortal.onboarding.q2_worker_job}
-              {step === 11 && t.report.communityPortal.onboarding.q3}
-              {step === 12 && t.report.communityPortal.onboarding.q4}
-              {step === 13 && t.report.communityPortal.onboarding.success}
+      <div className="bg-zinc-900/40 backdrop-blur-2xl rounded-[2.5rem] border border-zinc-800/50 p-6 md:p-12 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[100px] -mr-32 -mt-32" />
+        
+        <div className="flex items-center gap-4 mb-12 relative z-10">
+          <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Bot className="text-white" size={28} />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white tracking-tight">{t.report.communityPortal.onboarding.aiName}</h2>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.chat.status}</p>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        </div>
 
-        {isTyping && (
-          <div className="flex gap-1.5 p-4 bg-zinc-800/30 rounded-2xl w-fit">
-            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce" />
+        <div className="space-y-8 mb-12 min-h-[250px] relative z-10">
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={step}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              {feedback && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-cyan-500/10 border border-cyan-500/20 p-5 rounded-2xl text-cyan-400 text-xs md:text-sm italic flex items-start gap-3"
+                >
+                  <Sparkles size={16} className="flex-shrink-0 mt-0.5" />
+                  <p>"{feedback}"</p>
+                </motion.div>
+              )}
+
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-red-500/10 border border-red-500/20 p-5 rounded-2xl text-red-400 text-xs md:text-sm flex items-start gap-3"
+                >
+                  <ShieldAlert size={16} className="flex-shrink-0 mt-0.5" />
+                  <p>{error}</p>
+                </motion.div>
+              )}
+
+              <div className="bg-zinc-800/30 p-6 md:p-8 rounded-3xl rounded-tl-none border border-zinc-700/50 text-zinc-100 text-sm md:text-lg font-light leading-relaxed">
+                {step === -1 && (
+                  <div className="space-y-6">
+                    <p>{t.report.communityPortal.onboarding.browseNo}</p>
+                    <button 
+                      onClick={onBack}
+                      className="flex items-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all border border-zinc-700"
+                    >
+                      <ArrowRight className="rotate-180" size={14} />
+                      {t.report.communityPortal.onboarding.browseBack}
+                    </button>
+                  </div>
+                )}
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <p className="text-cyan-400 font-bold italic text-base md:text-xl">"{t.report.communityPortal.onboarding.aiIntro}"</p>
+                    <p className="text-zinc-300">{t.report.communityPortal.onboarding.humanCheck}</p>
+                  </div>
+                )}
+                {step === 2 && t.report.communityPortal.onboarding.cameroonCheck}
+                {step === 3 && t.report.communityPortal.onboarding.browseCheck}
+                {step === 4 && t.report.communityPortal.onboarding.understandingQ}
+                {step === 5 && t.report.communityPortal.onboarding.q1}
+                {step === 6 && t.report.communityPortal.onboarding.q2}
+                {step === 7 && t.report.communityPortal.onboarding.q2_student_school}
+                {step === 8 && t.report.communityPortal.onboarding.q2_student_major}
+                {step === 9 && t.report.communityPortal.onboarding.q2_student_level}
+                {step === 10 && t.report.communityPortal.onboarding.q2_worker_job}
+                {step === 11 && t.report.communityPortal.onboarding.q3}
+                {step === 12 && t.report.communityPortal.onboarding.q4}
+                {step === 13 && (
+                  <div className="text-center space-y-6">
+                    <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
+                      <CheckCircle2 className="text-emerald-400" size={40} />
+                    </div>
+                    <p className="text-xl font-bold text-white">{t.report.communityPortal.onboarding.success}</p>
+                    <div className="flex items-center justify-center gap-2 text-amber-400 font-bold uppercase tracking-widest text-xs">
+                      <Star size={16} fill="currentColor" />
+                      <span>{lang === 'fr' ? 'Étoile de mérite PowerAi accordée' : 'PowerAi merit star granted'}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {isTyping && (
+            <div className="flex gap-2 p-4 bg-zinc-800/30 rounded-2xl w-fit">
+              <span className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" />
+            </div>
+          )}
+        </div>
+
+        {step > 0 && step < 13 && (
+          <div className="relative z-10">
+            <input 
+              autoFocus
+              type="text"
+              value={currentInput}
+              onChange={(e) => setCurrentInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && currentInput.trim() && handleNext()}
+              placeholder={lang === 'fr' ? 'Tapez votre réponse ici...' : 'Type your answer here...'}
+              className="w-full bg-zinc-950/80 border border-zinc-800 rounded-2xl px-6 py-5 focus:ring-4 focus:ring-cyan-500/20 outline-none text-white transition-all text-lg placeholder:text-zinc-700"
+            />
+            <button 
+              onClick={handleNext}
+              disabled={!currentInput.trim() || isTyping}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-4 bg-cyan-500 text-zinc-950 rounded-xl hover:bg-cyan-400 disabled:opacity-50 transition-all shadow-lg shadow-cyan-500/20"
+            >
+              <ArrowRight size={24} />
+            </button>
           </div>
         )}
+
+        {step === 13 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4 relative z-10"
+          >
+            <button 
+              onClick={onBack}
+              className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-zinc-950 px-8 py-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-2xl shadow-cyan-500/40 flex items-center justify-center gap-3"
+            >
+              <Rocket size={20} />
+              {t.report.communityPortal.onboarding.back}
+            </button>
+          </motion.div>
+        )}
       </div>
-
-      {step > 0 && step < 13 && (
-        <div className="relative">
-          <input 
-            autoFocus
-            type="text"
-            value={currentInput}
-            onChange={(e) => setCurrentInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && currentInput.trim() && handleNext()}
-            placeholder="..."
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-cyan-500/50 outline-none text-white transition-all"
-          />
-          <button 
-            onClick={handleNext}
-            disabled={!currentInput.trim() || isTyping}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-cyan-500 text-zinc-950 rounded-xl hover:bg-cyan-400 disabled:opacity-50 transition-all"
-          >
-            <ArrowRight size={20} />
-          </button>
-        </div>
-      )}
-
-      {step === 13 && (
-        <div className="space-y-4">
-          <button 
-            onClick={onBack}
-            className="w-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-cyan-500/20 flex items-center justify-center gap-3"
-          >
-            <CheckCircle2 size={20} />
-            {t.report.communityPortal.onboarding.back}
-          </button>
-        </div>
-      )}
     </div>
   )}
 </motion.div>
@@ -1391,50 +1484,82 @@ function MembersSection({ t, members }: { t: any, members: any[] }) {
 
   return (
     <motion.section 
-      id="members-section"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      className="py-24 px-4"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      className="py-24 px-4 relative"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent pointer-events-none" />
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6">
-            <Users className="text-cyan-400" size={16} />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">{t.report.communityPortal.foundersPortal.members.title}</span>
-          </div>
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">{t.report.communityPortal.foundersPortal.members.title}</h2>
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6"
+          >
+            <Sparkles className="text-cyan-400" size={16} />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400">Elite Network</span>
+          </motion.div>
+          <h2 className="text-4xl md:text-7xl font-bold text-white mb-6 tracking-tighter leading-tight">
+            {t.report.communityPortal.foundersPortal.members.title}
+          </h2>
+          <p className="text-zinc-500 max-w-2xl mx-auto text-sm md:text-base font-light">
+            Découvrez les esprits brillants qui façonnent l'avenir de l'IA avec PowerAi.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {members.map((member) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {members.map((member, i) => (
             <motion.div 
               key={member.id}
-              whileHover={{ y: -10 }}
-              className="bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-8 relative overflow-hidden group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -10, scale: 1.02 }}
+              className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/50 rounded-[2.5rem] p-6 md:p-8 relative overflow-hidden group transition-all hover:border-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/10"
             >
-              {member.is_founder === 1 && (
-                <div className="absolute top-6 right-6 px-3 py-1 bg-cyan-500 text-zinc-950 text-[8px] font-black uppercase tracking-[0.2em] rounded-full">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-cyan-500/10 transition-all" />
+              
+              {member.is_founder === 1 ? (
+                <div className="absolute top-6 right-6 px-3 py-1 bg-gradient-to-r from-cyan-500 to-cyan-600 text-zinc-950 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
                   {t.report.communityPortal.foundersPortal.members.founders}
                 </div>
+              ) : member.has_star === 1 && (
+                <div className="absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
+                  <Star size={10} fill="currentColor" />
+                  Good Star
+                </div>
               )}
+
               <div className="flex items-center gap-5 mb-8">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl">
-                  <img src={member.image_url} alt={member.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-zinc-800 group-hover:border-cyan-500/50 shadow-2xl transition-all">
+                  <img src={member.image_url} alt={member.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" referrerPolicy="no-referrer" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                  <p className="text-sm text-cyan-400 font-medium">{member.role}</p>
+                  <h3 className="text-lg md:text-xl font-bold text-white mb-1 group-hover:text-cyan-400 transition-colors">{member.name}</h3>
+                  <p className="text-xs md:text-sm text-cyan-400/80 font-medium tracking-tight">{member.role}</p>
                 </div>
               </div>
-              <p className="text-zinc-400 text-sm leading-relaxed mb-8 font-light italic">
-                "{member.bio}"
-              </p>
+
+              <div className="relative">
+                <div className="absolute -left-4 top-0 text-cyan-500/20 text-4xl font-serif">"</div>
+                <p className="text-zinc-400 text-xs md:text-sm leading-relaxed mb-8 font-light italic pl-2">
+                  {member.bio}
+                </p>
+              </div>
+
               <div className="pt-6 border-t border-zinc-800/50 flex items-center justify-between">
-                <span className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">
-                  {t.report.communityPortal.foundersPortal.members.joined} {new Date(member.joined_at).toLocaleDateString()}
-                </span>
-                <div className="w-2 h-2 rounded-full bg-emerald-500/50" />
+                <div className="flex items-center gap-2">
+                  <Calendar size={12} className="text-zinc-600" />
+                  <span className="text-[9px] md:text-[10px] text-zinc-600 uppercase tracking-widest font-bold">
+                    {t.report.communityPortal.foundersPortal.members.joined} {new Date(member.joined_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[8px] text-emerald-500/50 font-bold uppercase tracking-widest">Active</span>
+                </div>
               </div>
             </motion.div>
           ))}
@@ -1667,82 +1792,157 @@ function FoundersPortal({ t, onBack }: { t: any, onBack: () => void }) {
       </div>
 
       {activeTab === 'applications' ? (
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-zinc-950 border-b border-zinc-800">
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.name}</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.email}</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.role}</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.aiAssessment}</th>
-                  <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.actions}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {applications.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="p-12 text-center text-zinc-500 italic">
-                      {t.report.communityPortal.foundersPortal.noApplications}
-                    </td>
+        <div className="space-y-6">
+          {/* Desktop Table */}
+          <div className="hidden lg:block bg-zinc-900/50 border border-zinc-800 rounded-[2rem] overflow-hidden shadow-2xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-zinc-950 border-b border-zinc-800">
+                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.name}</th>
+                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.email}</th>
+                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.role}</th>
+                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.aiAssessment}</th>
+                    <th className="p-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">{t.report.communityPortal.foundersPortal.table.actions}</th>
                   </tr>
-                ) : (
-                  applications.map((app) => (
-                    <tr key={app.id} className="hover:bg-zinc-800/30 transition-colors group">
-                      <td className="p-6">
-                        <p className="text-sm font-bold text-white">{app.name}</p>
-                        <p className="text-[10px] text-zinc-600 font-mono mt-1">
-                          {new Date(app.submitted_at).toLocaleDateString()}
-                        </p>
-                      </td>
-                      <td className="p-6">
-                        <p className="text-xs text-cyan-400 font-mono">{app.email}</p>
-                      </td>
-                      <td className="p-6">
-                        <p className="text-xs text-zinc-300">{app.role}</p>
-                        <p className="text-[10px] text-zinc-500 mt-1">{app.status}</p>
-                      </td>
-                      <td className="p-6 max-w-xs">
-                        <div className="bg-cyan-500/5 border border-cyan-500/10 p-3 rounded-xl">
-                          <p className="text-[11px] text-cyan-200/80 italic leading-relaxed">
-                            {app.ai_assessment || "En attente d'analyse..."}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="p-6">
-                        {app.moderation_status === 'pending' ? (
-                          <div className="flex gap-2">
-                            <button 
-                              onClick={() => handleModeration(app.id, 'accepted')}
-                              className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-zinc-950 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20 transition-all"
-                            >
-                              {t.report.communityPortal.foundersPortal.actions.accept}
-                            </button>
-                            <button 
-                              onClick={() => handleModeration(app.id, 'rejected')}
-                              className="px-4 py-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-zinc-950 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-red-500/20 transition-all"
-                            >
-                              {t.report.communityPortal.foundersPortal.actions.reject}
-                            </button>
-                          </div>
-                        ) : (
-                          <span className={cn(
-                            "text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border",
-                            app.moderation_status === 'accepted' ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/5" : "text-red-400 border-red-500/20 bg-red-500/5"
-                          )}>
-                            {app.moderation_status === 'accepted' ? t.report.communityPortal.foundersPortal.actions.accepted : t.report.communityPortal.foundersPortal.actions.rejected}
-                          </span>
-                        )}
+                </thead>
+                <tbody className="divide-y divide-zinc-800">
+                  {applications.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="p-12 text-center text-zinc-500 italic">
+                        {t.report.communityPortal.foundersPortal.noApplications}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    applications.map((app) => (
+                      <tr key={app.id} className="hover:bg-zinc-800/30 transition-colors group">
+                        <td className="p-6">
+                          <p className="text-sm font-bold text-white">{app.name}</p>
+                          <p className="text-[10px] text-zinc-600 font-mono mt-1">
+                            {new Date(app.submitted_at).toLocaleDateString()}
+                          </p>
+                        </td>
+                        <td className="p-6">
+                          <p className="text-xs text-cyan-400 font-mono">{app.email}</p>
+                        </td>
+                        <td className="p-6">
+                          <p className="text-xs text-zinc-300">{app.role}</p>
+                          <p className="text-[10px] text-zinc-500 mt-1">{app.status}</p>
+                        </td>
+                        <td className="p-6 max-w-xs">
+                          <div className="bg-cyan-500/5 border border-cyan-500/10 p-3 rounded-xl">
+                            <p className="text-[11px] text-cyan-200/80 italic leading-relaxed">
+                              <Sparkles size={12} className="inline mr-2 mb-1" />
+                              {app.ai_assessment || "En attente d'analyse..."}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="p-6">
+                          {app.moderation_status === 'pending' ? (
+                            <div className="flex gap-2">
+                              <button 
+                                onClick={() => handleModeration(app.id, 'accepted')}
+                                className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-zinc-950 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-emerald-500/20 transition-all flex items-center gap-2"
+                              >
+                                <Star size={14} fill="currentColor" />
+                                {t.report.communityPortal.foundersPortal.actions.accept}
+                              </button>
+                              <button 
+                                onClick={() => handleModeration(app.id, 'rejected')}
+                                className="px-4 py-2 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-zinc-950 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-red-500/20 transition-all"
+                              >
+                                {t.report.communityPortal.foundersPortal.actions.reject}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className={cn(
+                              "text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border",
+                              app.moderation_status === 'accepted' ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/5" : "text-red-400 border-red-500/20 bg-red-500/5"
+                            )}>
+                              {app.moderation_status === 'accepted' ? t.report.communityPortal.foundersPortal.actions.accepted : t.report.communityPortal.foundersPortal.actions.rejected}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="lg:hidden space-y-4">
+            {applications.length === 0 ? (
+              <div className="p-12 text-center text-zinc-500 italic bg-zinc-900/50 border border-zinc-800 rounded-3xl">
+                {t.report.communityPortal.foundersPortal.noApplications}
+              </div>
+            ) : (
+              applications.map((app) => (
+                <motion.div 
+                  key={app.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-3xl space-y-6"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-bold text-white">{app.name}</h3>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">{app.status}</p>
+                    </div>
+                    <span className={cn(
+                      "px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest border",
+                      app.moderation_status === 'accepted' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
+                      app.moderation_status === 'rejected' ? "bg-red-500/10 text-red-400 border-red-500/20" : 
+                      "bg-zinc-800 text-zinc-500 border-zinc-700"
+                    )}>
+                      {app.moderation_status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-[11px]">
+                    <div>
+                      <p className="text-zinc-600 uppercase tracking-widest font-bold mb-1">Email</p>
+                      <p className="text-zinc-300 font-mono break-all">{app.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-zinc-600 uppercase tracking-widest font-bold mb-1">Role</p>
+                      <p className="text-zinc-300">{app.role}</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-cyan-500/5 border border-cyan-500/10 rounded-2xl text-[11px] text-cyan-400 italic leading-relaxed">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Bot size={14} />
+                      <span className="font-bold uppercase tracking-widest">POWER Assessment</span>
+                    </div>
+                    {app.ai_assessment}
+                  </div>
+
+                  {app.moderation_status === 'pending' && (
+                    <div className="flex gap-3 pt-2">
+                      <button 
+                        onClick={() => handleModeration(app.id, 'accepted')}
+                        className="flex-1 py-3 bg-emerald-500 text-zinc-950 rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                      >
+                        <Star size={14} fill="currentColor" />
+                        {t.report.communityPortal.foundersPortal.actions.accept}
+                      </button>
+                      <button 
+                        onClick={() => handleModeration(app.id, 'rejected')}
+                        className="w-12 h-12 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-zinc-950 rounded-xl transition-all border border-red-500/20 flex items-center justify-center"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  )}
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {members.map((member) => (
             <motion.div 
               key={member.id}
@@ -1773,6 +1973,7 @@ function FoundersPortal({ t, onBack }: { t: any, onBack: () => void }) {
                 </span>
                 <div className="flex gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  {member.has_star === 1 && <Star size={14} className="text-amber-400" fill="currentColor" />}
                 </div>
               </div>
             </motion.div>
