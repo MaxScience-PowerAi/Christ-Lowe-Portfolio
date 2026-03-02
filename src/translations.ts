@@ -171,6 +171,31 @@ export const translations = {
           { title: "Vous êtes un jeune passionné ?", desc: "18-30 ans, curieux d'IA. Rejoignez la liste d'attente AI Start 237." }
         ],
         footer: "L'IA pour le Cameroun, par des Camerounais, avec des Camerounais."
+      },
+      communityPortal: {
+        hero: {
+          tag: "COMMUNAUTÉ",
+          title: "Bâtissons l'IA de demain",
+          desc: "PowerAi n'est pas qu'un projet, c'est un mouvement. Rejoignez l'élite technologique du Cameroun."
+        },
+        future: {
+          title: "L'Avenir de PowerAi",
+          vision1: "Un écosystème où chaque PME camerounaise possède son propre cerveau numérique.",
+          vision2: "Une jeunesse formée, prête à exporter son génie IA à l'international.",
+          vision3: "Le Cameroun comme hub technologique de l'Afrique Centrale."
+        },
+        onboarding: {
+          title: "Candidature Membre",
+          start: "Commencer l'adhésion",
+          aiIntro: "Bonjour futur membre ! Je vais vous poser quelques questions pour mieux vous connaître et voir si vous avez bien saisi notre vision.",
+          q1: "Quel est votre nom complet ?",
+          q2: "Quelle est votre expertise ou passion principale (Développement, Design, Business, Mathématiques...) ?",
+          q3: "Qu'avez-vous compris de la mission de PowerAi après avoir parcouru notre interface ? (C'est important pour nous)",
+          q4: "Pourquoi souhaitez-vous rejoindre l'aventure PowerAi précisément ?",
+          success: "Parfait ! Votre sérieux est apprécié. Cliquez sur le bouton ci-dessous pour nous envoyer directement votre candidature par email.",
+          submitEmail: "Envoyer ma candidature par Email",
+          back: "Retour au site principal"
+        }
       }
     }
   },
@@ -346,6 +371,31 @@ export const translations = {
           { title: "Are you a passionate youth?", desc: "18-30 years, AI curious. Join the AI Start 237 waitlist." }
         ],
         footer: "AI for Cameroon, by Cameroonians, with Cameroonians."
+      },
+      communityPortal: {
+        hero: {
+          tag: "COMMUNITY",
+          title: "Building Tomorrow's AI",
+          desc: "PowerAi is not just a project, it's a movement. Join Cameroon's technological elite."
+        },
+        future: {
+          title: "The Future of PowerAi",
+          vision1: "An ecosystem where every Cameroonian SME has its own digital brain.",
+          vision2: "A trained youth, ready to export their AI genius internationally.",
+          vision3: "Cameroon as the technological hub of Central Africa."
+        },
+        onboarding: {
+          title: "Member Application",
+          start: "Start Membership",
+          aiIntro: "Hello future member! I'm going to ask you a few questions to get to know you better and see if you've grasped our vision.",
+          q1: "What is your full name?",
+          q2: "What is your main expertise or passion (Development, Design, Business, Mathematics...)?",
+          q3: "What did you understand about PowerAi's mission after browsing our interface? (This is important to us)",
+          q4: "Why exactly do you want to join the PowerAi adventure?",
+          success: "Perfect! Your seriousness is appreciated. Click the button below to send us your application directly by email.",
+          submitEmail: "Send my application by Email",
+          back: "Back to main site"
+        }
       }
     }
   }

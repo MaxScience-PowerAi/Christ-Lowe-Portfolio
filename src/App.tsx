@@ -35,6 +35,7 @@ import { cn } from './lib/utils';
 import { translations } from './translations';
 
 export default function App() {
+  const [view, setView] = useState<'landing' | 'community'>('landing');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
@@ -166,6 +167,22 @@ export default function App() {
               <MessageSquare size={14} />
               <span className="hidden sm:inline">{t.header.aiAssistant}</span>
             </button>
+            {view === 'landing' && (
+              <button 
+                onClick={() => setView('community')}
+                className="bg-white/10 hover:bg-white/20 text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
+              >
+                {t.report.solution.community.title}
+              </button>
+            )}
+            {view === 'community' && (
+              <button 
+                onClick={() => setView('landing')}
+                className="bg-white/10 hover:bg-white/20 text-white px-3 md:px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-white/20"
+              >
+                {t.report.communityPortal.onboarding.back}
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -289,7 +306,9 @@ export default function App() {
       </AnimatePresence>
 
       <main className="pt-16">
-        {/* Hero Section */}
+        {view === 'landing' ? (
+          <>
+            {/* Hero Section */}
         <motion.section 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -940,7 +959,6 @@ export default function App() {
             </div>
           </div>
         </motion.section>
-      </main>
 
       {/* Footer */}
       <footer className="py-12 border-t border-zinc-900 bg-black text-center">
@@ -952,6 +970,163 @@ export default function App() {
         </div>
         <p className="text-[10px] text-zinc-600 uppercase tracking-widest">{t.header.presentation}</p>
       </footer>
+    </>
+  ) : (
+    <CommunityPortal lang={lang} t={t} onBack={() => setView('landing')} />
+  )}
+</main>
+</div>
+);
+}
+
+function CommunityPortal({ lang, t, onBack }: { lang: 'fr' | 'en', t: any, onBack: () => void }) {
+  const [step, setStep] = useState(0); // 0: Intro, 1: Q1, 2: Q2, 3: Q3, 4: Q4, 5: Success
+  const [answers, setAnswers] = useState({ name: '', expertise: '', understanding: '', reason: '' });
+  const [currentInput, setCurrentInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleNext = () => {
+    if (step === 1) setAnswers({ ...answers, name: currentInput });
+    if (step === 2) setAnswers({ ...answers, expertise: currentInput });
+    if (step === 3) setAnswers({ ...answers, understanding: currentInput });
+    if (step === 4) setAnswers({ ...answers, reason: currentInput });
+
+    setCurrentInput('');
+    setIsTyping(true);
+    setTimeout(() => {
+      setStep(step + 1);
+      setIsTyping(false);
+    }, 1000);
+  };
+
+  const handleEmailSubmit = () => {
+    const subject = `Candidature PowerAi - ${answers.name}`;
+    const body = `Nom: ${answers.name}\nExpertise: ${answers.expertise}\nCompréhension: ${answers.understanding}\nMotivation: ${answers.reason}`;
+    window.location.href = `mailto:christlowe6@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+return (
+<div className="min-h-[90vh] flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
+{/* Background elements */}
+<div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+  <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" />
+</div>
+
+<motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="max-w-4xl w-full z-10"
+>
+  {step === 0 ? (
+    <div className="text-center">
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-8">
+        <Users className="text-cyan-400" size={16} />
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">{t.report.communityPortal.hero.tag}</span>
+      </div>
+      <h1 className="text-4xl md:text-7xl font-bold text-white mb-8 tracking-tighter leading-tight">
+        {t.report.communityPortal.hero.title}
+      </h1>
+      <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto font-light">
+        {t.report.communityPortal.hero.desc}
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {[t.report.communityPortal.future.vision1, t.report.communityPortal.future.vision2, t.report.communityPortal.future.vision3].map((v, i) => (
+          <div key={i} className="p-6 bg-zinc-900/50 rounded-2xl border border-zinc-800 text-left hover:border-cyan-500/30 transition-all">
+            <p className="text-sm text-zinc-300 leading-relaxed">{v}</p>
+          </div>
+        ))}
+      </div>
+
+      <button 
+        onClick={() => setStep(1)}
+        className="bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-8 py-4 rounded-full text-sm font-bold transition-all shadow-xl shadow-cyan-500/20 flex items-center gap-3 mx-auto"
+      >
+        {t.report.communityPortal.onboarding.start}
+        <ArrowRight size={18} />
+      </button>
     </div>
-  );
+  ) : (
+    <div className="max-w-2xl mx-auto bg-zinc-900/50 backdrop-blur-md rounded-[2.5rem] border border-zinc-800 p-8 md:p-12 shadow-2xl">
+      <div className="flex items-center gap-4 mb-12">
+        <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center border border-cyan-500/20">
+          <Bot className="text-cyan-400" size={24} />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-white tracking-tight">{t.report.communityPortal.onboarding.title}</h2>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">{t.chat.status}</p>
+        </div>
+      </div>
+
+      <div className="space-y-8 mb-12 min-h-[200px]">
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-4"
+          >
+            <div className="bg-zinc-800/50 p-6 rounded-2xl rounded-tl-none border border-zinc-700 text-zinc-200">
+              {step === 1 && t.report.communityPortal.onboarding.q1}
+              {step === 2 && t.report.communityPortal.onboarding.q2}
+              {step === 3 && t.report.communityPortal.onboarding.q3}
+              {step === 4 && t.report.communityPortal.onboarding.q4}
+              {step === 5 && t.report.communityPortal.onboarding.success}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {isTyping && (
+          <div className="flex gap-1.5 p-4 bg-zinc-800/30 rounded-2xl w-fit">
+            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce" />
+          </div>
+        )}
+      </div>
+
+      {step < 5 && (
+        <div className="relative">
+          <input 
+            autoFocus
+            type="text"
+            value={currentInput}
+            onChange={(e) => setCurrentInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && currentInput.trim() && handleNext()}
+            placeholder="..."
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-cyan-500/50 outline-none text-white transition-all"
+          />
+          <button 
+            onClick={handleNext}
+            disabled={!currentInput.trim() || isTyping}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-cyan-500 text-zinc-950 rounded-xl hover:bg-cyan-400 disabled:opacity-50 transition-all"
+          >
+            <ArrowRight size={20} />
+          </button>
+        </div>
+      )}
+
+      {step === 5 && (
+        <div className="space-y-4">
+          <button 
+            onClick={handleEmailSubmit}
+            className="w-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 px-8 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-cyan-500/20 flex items-center justify-center gap-3"
+          >
+            <Mail size={20} />
+            {t.report.communityPortal.onboarding.submitEmail}
+          </button>
+          <button 
+            onClick={onBack}
+            className="w-full bg-zinc-800 hover:bg-zinc-700 text-white px-8 py-4 rounded-2xl font-bold transition-all border border-zinc-700"
+          >
+            {t.report.communityPortal.onboarding.back}
+          </button>
+        </div>
+      )}
+    </div>
+  )}
+</motion.div>
+</div>
+);
 }
