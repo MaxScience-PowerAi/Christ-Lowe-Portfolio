@@ -2150,13 +2150,25 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
             </div>
             
             {error && (
-              <motion.p 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-red-400 text-xs text-center font-medium bg-red-400/10 py-2 rounded-lg border border-red-400/20"
-              >
-                {error}
-              </motion.p>
+              <div className="space-y-2">
+                <motion.p 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-red-400 text-xs text-center font-medium bg-red-400/10 py-2 rounded-lg border border-red-400/20"
+                >
+                  {error}
+                </motion.p>
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('powerai_founder_key');
+                    setPassword('');
+                    setError(null);
+                  }}
+                  className="w-full text-[10px] text-zinc-500 hover:text-cyan-400 transition-colors uppercase tracking-widest font-bold"
+                >
+                  Réinitialiser la clé
+                </button>
+              </div>
             )}
 
             <button 

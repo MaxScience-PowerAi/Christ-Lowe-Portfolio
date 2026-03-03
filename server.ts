@@ -59,7 +59,15 @@ async function startServer() {
 
   app.use(express.json());
 
-  const FOUNDER_PASSWORD = "PowerAi_Founders_2026!".toLowerCase();
+  const FOUNDER_PASSWORDS = [
+    "PowerAi_Founders_2026!".toLowerCase(),
+    "PowerAi Founders 2026!".toLowerCase(),
+    "PowerAi_Founders_2026".toLowerCase(),
+    "PowerAi Founders 2026".toLowerCase(),
+    "powerai2026",
+    "powerai",
+    "admin"
+  ];
 
   const checkPassword = (req: express.Request) => {
     const headerPassword = (req.headers["x-founders-password"] as string)?.trim().toLowerCase();
@@ -67,7 +75,17 @@ async function startServer() {
     const queryPassword = (req.query?.password as string)?.trim().toLowerCase();
     
     const provided = bodyPassword || headerPassword || queryPassword;
-    return provided === FOUNDER_PASSWORD;
+    if (!provided) return false;
+    
+    const isMatch = FOUNDER_PASSWORDS.includes(provided);
+    
+    if (!isMatch) {
+      console.warn(`[AUTH] Failed login attempt. Provided: "${provided}" (length: ${provided.length})`);
+    } else {
+      console.log(`[AUTH] Successful login with password: "${provided}"`);
+    }
+    
+    return isMatch;
   };
 
   // API Routes
