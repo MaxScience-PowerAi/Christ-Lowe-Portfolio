@@ -2010,7 +2010,7 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
   members: any[],
   onRefreshMembers: () => void
 }) {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(() => localStorage.getItem('powerai_founder_key') || '');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [applications, setApplications] = useState<any[]>([]);
@@ -2020,12 +2020,21 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const fetchApplications = async () => {
+  useEffect(() => {
+    // Auto-login if password exists in localStorage
+    const savedPassword = localStorage.getItem('powerai_founder_key');
+    if (savedPassword && !isAuthorized) {
+      handleLogin(savedPassword);
+    }
+  }, []);
+
+  const fetchApplications = async (overridePassword?: string) => {
+    const passToUse = overridePassword || password;
     try {
       const response = await fetch('/api/founders/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: password.trim() })
+        body: JSON.stringify({ password: passToUse.trim() })
       });
       if (response.ok) {
         const data = await response.json();
@@ -2041,19 +2050,23 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (overridePassword?: string) => {
+    const passToUse = overridePassword || password;
+    if (!passToUse) return;
+
     setLoading(true);
     setError(null);
     try {
       const response = await fetch('/api/founders/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: password.trim() })
+        body: JSON.stringify({ password: passToUse.trim() })
       });
       if (response.ok) {
         const data = await response.json();
         setApplications(data.applications);
         setIsAuthorized(true);
+        localStorage.setItem('powerai_founder_key', passToUse.trim());
         
         const pendingCount = data.applications.filter((a: any) => a.moderation_status === 'pending').length;
         if (pendingCount > 0) {
@@ -2062,10 +2075,13 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
         
         onRefreshMembers();
       } else {
-        setError(t.report.communityPortal.foundersPortal.error);
+        setError(`${t.report.communityPortal.foundersPortal.error} (Code: ${response.status})`);
+        if (response.status === 401) {
+          localStorage.removeItem('powerai_founder_key');
+        }
       }
     } catch (err) {
-      setError("Erreur de connexion au serveur.");
+      setError("Erreur de connexion au serveur. Vérifiez votre connexion internet.");
     } finally {
       setLoading(false);
     }
@@ -2144,7 +2160,7 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
             )}
 
             <button 
-              onClick={handleLogin}
+              onClick={() => handleLogin()}
               disabled={loading}
               className="w-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-cyan-500/20 active:scale-95 flex items-center justify-center gap-2"
             >
@@ -2224,13 +2240,26 @@ function FoundersPortal({ t, lang, onBack, members, onRefreshMembers }: {
             </div>
           </div>
         </div>
-        <button 
-          onClick={onBack}
-          className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full text-xs font-bold border border-zinc-700 transition-all flex items-center gap-2"
-        >
-          <LogOut size={14} />
-          {t.report.communityPortal.foundersPortal.logout}
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => fetchApplications()}
+            disabled={loading}
+            className="p-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-cyan-400 rounded-full transition-all border border-zinc-700 disabled:opacity-50"
+            title="Rafraîchir"
+          >
+            <RefreshCw size={14} className={cn(loading && "animate-spin")} />
+          </button>
+          <button 
+            onClick={() => {
+              localStorage.removeItem('powerai_founder_key');
+              onBack();
+            }}
+            className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full text-xs font-bold border border-zinc-700 transition-all flex items-center gap-2"
+          >
+            <LogOut size={14} />
+            {t.report.communityPortal.foundersPortal.logout}
+          </button>
+        </div>
       </div>
 
       <StrategicDashboard t={t} lang={lang} applications={applications} members={members} />

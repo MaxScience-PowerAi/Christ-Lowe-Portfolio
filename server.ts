@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import Database from "better-sqlite3";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,7 +49,26 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Enable CORS for all origins and allow specific headers
+  app.use(cors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-founders-password', 'Accept', 'Origin']
+  }));
+
   app.use(express.json());
+
+  const FOUNDER_PASSWORD = "PowerAi_Founders_2026!".toLowerCase();
+
+  const checkPassword = (req: express.Request) => {
+    const headerPassword = (req.headers["x-founders-password"] as string)?.trim().toLowerCase();
+    const bodyPassword = req.body?.password?.trim().toLowerCase();
+    const queryPassword = (req.query?.password as string)?.trim().toLowerCase();
+    
+    const provided = bodyPassword || headerPassword || queryPassword;
+    return provided === FOUNDER_PASSWORD;
+  };
 
   // API Routes
   app.post("/api/applications", (req, res) => {
@@ -67,12 +87,9 @@ async function startServer() {
   });
 
   app.patch("/api/applications/:id", (req, res) => {
-    const headerPassword = (req.headers["x-founders-password"] as string)?.trim();
-    const bodyPassword = req.body.password?.trim();
-    const password = bodyPassword || headerPassword;
-
-    if (password !== "PowerAi_Founders_2026!") {
-      console.warn(`Unauthorized moderation attempt with password: ${password}`);
+    if (!checkPassword(req)) {
+      const provided = req.body?.password || req.headers["x-founders-password"];
+      console.warn(`Unauthorized moderation attempt with password: ${provided}`);
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -97,10 +114,7 @@ async function startServer() {
   });
 
   app.post("/api/founders/login", (req, res) => {
-    const { password } = req.body;
-    const trimmedPassword = password?.trim();
-    
-    if (trimmedPassword === "PowerAi_Founders_2026!") {
+    if (checkPassword(req)) {
       try {
         const applications = db.prepare("SELECT * FROM applications ORDER BY submitted_at DESC").all();
         res.json({ success: true, applications });
@@ -109,7 +123,8 @@ async function startServer() {
         res.status(500).json({ error: "Failed to fetch applications" });
       }
     } else {
-      console.warn(`Unauthorized login attempt with password: ${trimmedPassword}`);
+      const provided = req.body?.password || req.headers["x-founders-password"];
+      console.warn(`Unauthorized login attempt with password: ${provided}`);
       res.status(401).json({ error: "Unauthorized" });
     }
   });
@@ -125,8 +140,7 @@ async function startServer() {
   });
 
   app.get("/api/applications", (req, res) => {
-    const password = (req.headers["x-founders-password"] as string)?.trim();
-    if (password !== "PowerAi_Founders_2026!") {
+    if (!checkPassword(req)) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
