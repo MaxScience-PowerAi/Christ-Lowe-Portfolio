@@ -45,11 +45,11 @@
 
 @layer base {
   :root {
-    --bg-app: #f8fafc;
-    --text-app: #0f172a;
+    --bg-app: #ffffff;
+    --text-app: #000000;
     --card-bg: #ffffff;
     --card-border: #e2e8f0;
-    --accent-cyan: #06b6d4;
+    --accent-cyan: #0891b2;
   }
 
   .dark {

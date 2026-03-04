@@ -221,7 +221,7 @@ export const translations = {
           q2_student_level: "Quel est votre niveau d'étude ?",
           q2_worker_job: "Quelle est votre profession ?",
           q3: "Que pouvez-vous apporter concrètement au projet PowerAi ?",
-          q4: "Comment pouvons-nous vous contacter ? (Numéro WhatsApp et Email)",
+          q4: "Comment pouvons-nous vous contacter ? (Précisez votre numéro WhatsApp et Email)",
           success: "Félicitations ! Vos informations ont été enregistrées dans le système sécurisé des fondateurs. POWER vous remercie pour votre sérieux et votre éthique.",
           meritStar: "Étoile de mérite PowerAi accordée",
           humanQuestions: [
@@ -509,7 +509,7 @@ export const translations = {
           q2_student_level: "What is your level of study?",
           q2_worker_job: "What is your profession?",
           q3: "What can you concretely bring to the PowerAi project?",
-          q4: "How can we contact you? (WhatsApp number and Email)",
+          q4: "How can we contact you? (Please specify your WhatsApp number and Email)",
           success: "Congratulations! Your information has been saved in the founders' secure system. POWER thanks you for your seriousness and ethics.",
           meritStar: "PowerAi merit star granted",
           humanQuestions: [
