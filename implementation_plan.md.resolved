@@ -1,0 +1,31 @@
+# Goal Description
+The server currently crashes on startup due to an incorrect initialization of the Gemini SDK (`@google/genai`). The syntax used in the codebase (`model.startChat`, `generateContent`, etc.) corresponds to the standard `@google/generative-ai` SDK, but the app tries to use the newer/different `@google/genai` package with incorrect parameters. 
+
+Additionally, the frontend fails to compile because of residual malformed JSX code left at the end of the [App](file:///c:/Users/A/Documents/test/PowerAi-presentation/src/App.tsx#142-1333) component in [src/App.tsx](file:///c:/Users/A/Documents/test/PowerAi-presentation/src/App.tsx). 
+
+We will fix these errors and ensure the environment is correctly configured.
+
+## Proposed Changes
+
+### Configuration & Dependencies
+- **package.json**
+  - Replace `@google/genai` with `@google/generative-ai` to match the exact API methods currently used in your [server.ts](file:///c:/Users/A/Documents/test/PowerAi-presentation/server.ts) logic.
+
+### Backend
+- **[MODIFY] [server.ts](file:///c:/Users/A/Documents/test/PowerAi-presentation/server.ts)**
+  - Update the import from `import { GoogleGenAI } from "@google/genai"` to `import { GoogleGenerativeAI } from "@google/generative-ai"`.
+  - Instantiate using `new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")`.
+  - Ensure API key gracefully falls back or throws a clear error if missing.
+
+### Frontend
+- **[MODIFY] [src/App.tsx](file:///c:/Users/A/Documents/test/PowerAi-presentation/src/App.tsx)**
+  - Delete lines 1334 to 1349 which contain leftover/unmatched tags (e.g., `</div >`, `</motion.section >`) that cause the TypeScript `Declaration or statement expected` syntax error.
+
+## Verification Plan
+### Automated Tests
+1. Run `npm run lint` (`tsc --noEmit`) to verify that the TypeScript syntax in [App.tsx](file:///c:/Users/A/Documents/test/PowerAi-presentation/src/App.tsx) is completely valid.
+2. Run `npm run dev` to verify that the server boots up properly without throwing the `API key must be set` exception.
+
+### Manual Verification
+1. Access the application in the browser to ensure the Frontend loads.
+2. We will quickly run a test AI chat request (if UI is accessible) to verify Gemini SDK is functioning.
