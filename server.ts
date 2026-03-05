@@ -37,12 +37,22 @@ db.exec(`
   );
 `);
 
-// Seed founders if not exists
+// Seed all 8 founders if not exists
 const foundersCount = db.prepare("SELECT COUNT(*) as count FROM members WHERE is_founder = 1").get() as { count: number };
 if (foundersCount.count === 0) {
-  const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url, is_founder) VALUES (?, ?, ?, ?, ?)");
-  insertMember.run("Lowe Christ", "Expert Technique & IA", "Visionnaire technologique spécialisé dans le développement de solutions d'intelligence artificielle avancées.", "https://picsum.photos/seed/lowe/400/400", 1);
-  insertMember.run("Wilfred Kouam", "Stratégie & Partenariats", "Expert en développement stratégique et gestion des relations institutionnelles.", "https://picsum.photos/seed/wilfred/400/400", 1);
+  const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url, is_founder, has_star) VALUES (?, ?, ?, ?, ?, ?)");
+
+  const founders = [
+    { name: "Maxime (Christ Lowe)", role: "L'Alchimiste Fondateur", bio: "Membre fondateur de la grande communauté qui souhaite innover l'intelligence artificielle en Afrique, plus précisément au Cameroun.", img: "maxime-profile.png" }
+  ];
+
+  // Using ui-avatars to generate nice initial avatars for the magical UI
+  for (const f of founders) {
+    const parts = f.name.split(' ');
+    const initials = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0][0];
+    const imageUrl = `https://ui-avatars.com/api/?name=${initials}&background=random&color=fff&size=400&font-size=0.4&bold=true`;
+    insertMember.run(f.name, f.role, f.bio, imageUrl, 1, 1);
+  }
 }
 
 async function startServer() {
@@ -73,18 +83,18 @@ async function startServer() {
     const headerPassword = (req.headers["x-founders-password"] as string)?.trim().toLowerCase();
     const bodyPassword = req.body?.password?.trim().toLowerCase();
     const queryPassword = (req.query?.password as string)?.trim().toLowerCase();
-    
+
     const provided = bodyPassword || headerPassword || queryPassword;
     if (!provided) return false;
-    
+
     const isMatch = FOUNDER_PASSWORDS.includes(provided);
-    
+
     if (!isMatch) {
       console.warn(`[AUTH] Failed login attempt. Provided: "${provided}" (length: ${provided.length})`);
     } else {
       console.log(`[AUTH] Successful login with password: "${provided}"`);
     }
-    
+
     return isMatch;
   };
 
@@ -119,9 +129,22 @@ async function startServer() {
       updateStmt.run(moderation_status, id);
 
       if (moderation_status === 'accepted') {
-        const app = db.prepare("SELECT * FROM applications WHERE id = ?").get() as any;
-        const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url, has_star) VALUES (?, ?, ?, ?, ?)");
-        insertMember.run(app.name, app.role, app.contribution, `https://picsum.photos/seed/${app.name}/400/400`, 1);
+        const app = db.prepare("SELECT * FROM applications WHERE id = ?").get(id) as any;
+        if (app) {
+          const existing = db.prepare("SELECT id FROM members WHERE name = ?").get(app.name);
+          if (!existing) {
+            const initials = app.name.slice(0, 2).toUpperCase();
+            const imageUrl = `https://ui-avatars.com/api/?name=${initials}&background=random&color=fff&size=400`;
+            const insertMember = db.prepare("INSERT INTO members (name, role, bio, image_url, has_star) VALUES (?, ?, ?, ?, ?)");
+            insertMember.run(
+              app.name,
+              app.role || 'Membre',
+              app.contribution || app.understanding || '',
+              imageUrl,
+              1
+            );
+          }
+        }
       }
 
       res.json({ success: true });
