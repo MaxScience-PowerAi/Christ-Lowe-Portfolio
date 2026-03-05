@@ -1,128 +1,134 @@
 import React from 'react';
 
-export function PortfolioFooter() {
-    const scrollTo = (id: string) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    };
+interface FooterT {
+    tagline: string; nav: string; socials: string; rights: string; builtWith: string;
+}
+
+const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
+
+export function PortfolioFooter({ t }: { t: FooterT }) {
+    const currentYear = new Date().getFullYear();
 
     return (
         <footer style={{
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            padding: '3rem 1.5rem',
-            background: 'rgba(3,0,20,0.85)',
-            backdropFilter: 'blur(20px)',
+            borderTop: '1px solid var(--border)',
+            background: 'var(--footer-bg)',
+            padding: '4rem 1.5rem 2rem',
         }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-                {/* Top row */}
+            <div className="container-xl" style={{ maxWidth: 1000 }}>
                 <div style={{
-                    display: 'flex', flexWrap: 'wrap', gap: '2rem',
-                    justifyContent: 'space-between', alignItems: 'center',
-                    marginBottom: '2rem',
+                    display: 'grid',
+                    gridTemplateColumns: 'var(--footer-cols, 1fr 1fr)',
+                    gap: '3rem',
+                    marginBottom: '3rem',
                 }}>
-                    {/* Logo */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {/* Brand Col */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div style={{
-                            width: 38, height: 38, borderRadius: '0.75rem',
-                            background: 'linear-gradient(135deg, #22d3ee, #6366f1)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 0 20px rgba(34,211,238,0.3)',
+                            display: 'flex', alignItems: 'center', gap: '0.6rem',
                         }}>
-                            <span style={{ color: 'white', fontWeight: 900, fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>L</span>
-                        </div>
-                        <div>
                             <div style={{
-                                fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '0.95rem',
-                                background: 'linear-gradient(90deg, #22d3ee, #6366f1)',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                                width: 32, height: 32, borderRadius: '0.5rem',
+                                background: 'linear-gradient(135deg, var(--color-brand-cyan), var(--color-brand-blue))',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
-                                LINZE LOWE CHRIST MAXIME
+                                <span style={{ color: 'white', fontWeight: 900, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>CL</span>
                             </div>
-                            <div style={{ color: '#475569', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>
-                                Math Student · AI Enthusiast · Co-founder PowerAi
+                            <span style={{
+                                fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.1rem',
+                                color: 'var(--color-foreground)', letterSpacing: '-0.02em',
+                            }}>
+                                Christ Lowe
+                            </span>
+                        </div>
+                        <p style={{
+                            color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6,
+                            fontFamily: 'Inter, sans-serif', maxWidth: 300, margin: 0,
+                        }}>
+                            {t.tagline}
+                        </p>
+                    </div>
+
+                    {/* Links Col */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                        <div>
+                            <h4 style={{ color: 'var(--color-foreground)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '1rem', fontFamily: 'Inter, sans-serif' }}>{t.nav}</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {['Home', 'About', 'Skills', 'Projects'].map(link => (
+                                    <button
+                                        key={link}
+                                        onClick={() => scrollTo(link.toLowerCase())}
+                                        style={{
+                                            background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+                                            color: 'var(--text-muted)', fontSize: '0.9rem', fontFamily: 'Inter, sans-serif',
+                                            padding: 0, transition: 'color 0.2s',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = 'var(--color-brand-cyan)'}
+                                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                                    >
+                                        {link}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                    </div>
 
-                    {/* Quick nav */}
-                    <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                        {['home', 'about', 'skills', 'projects', 'contact'].map(id => (
-                            <button
-                                key={id}
-                                onClick={() => scrollTo(id)}
-                                style={{
-                                    background: 'none', border: 'none', cursor: 'pointer',
-                                    color: '#475569', fontWeight: 600, fontSize: '0.82rem',
-                                    fontFamily: 'Inter, sans-serif', textTransform: 'capitalize',
-                                    transition: 'color 0.2s', padding: 0,
-                                }}
-                                onMouseEnter={e => (e.currentTarget.style.color = '#22d3ee')}
-                                onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
-                            >
-                                {id.charAt(0).toUpperCase() + id.slice(1)}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Social icons */}
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        {[
-                            { icon: '🐙', href: 'https://github.com/MaxScience-PowerAi', label: 'GitHub' },
-                            { icon: '💼', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/', label: 'LinkedIn' },
-                            { icon: '✉️', href: 'mailto:christlowe6@gmail.com', label: 'Email' },
-                        ].map(s => (
-                            <a
-                                key={s.label}
-                                href={s.href}
-                                target={s.href.startsWith('http') ? '_blank' : undefined}
-                                rel="noopener noreferrer"
-                                aria-label={s.label}
-                                style={{
-                                    width: 38, height: 38, borderRadius: '0.65rem',
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '1.1rem', textDecoration: 'none',
-                                    transition: 'all 0.2s',
-                                }}
-                                onMouseEnter={e => {
-                                    (e.currentTarget as HTMLElement).style.background = 'rgba(34,211,238,0.1)';
-                                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(34,211,238,0.3)';
-                                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-                                }}
-                                onMouseLeave={e => {
-                                    (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
-                                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)';
-                                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                                }}
-                            >
-                                {s.icon}
-                            </a>
-                        ))}
+                        <div>
+                            <h4 style={{ color: 'var(--color-foreground)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '1rem', fontFamily: 'Inter, sans-serif' }}>{t.socials}</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {[
+                                    { label: 'GitHub', href: 'https://github.com/MaxScience-PowerAi' },
+                                    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/' },
+                                    { label: 'PowerAi', href: '#' },
+                                ].map(link => (
+                                    <a
+                                        key={link.label}
+                                        href={link.href}
+                                        target="_blank" rel="noopener noreferrer"
+                                        style={{
+                                            color: 'var(--text-muted)', fontSize: '0.9rem', fontFamily: 'Inter, sans-serif',
+                                            textDecoration: 'none', transition: 'color 0.2s',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.color = 'var(--color-brand-cyan)'}
+                                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                                    >
+                                        {link.label}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Divider */}
-                <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', marginBottom: '1.5rem' }} />
-
-                {/* Bottom row */}
+                {/* Bottom bar */}
                 <div style={{
-                    display: 'flex', flexWrap: 'wrap', gap: '1rem',
-                    justifyContent: 'space-between', alignItems: 'center',
+                    paddingTop: '2rem', borderTop: '1px solid var(--border)',
+                    display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+                    flexWrap: 'wrap', gap: '1rem',
                 }}>
                     <p style={{
-                        color: '#334155', fontSize: '0.78rem', margin: 0,
-                        fontFamily: 'Inter, sans-serif',
+                        color: 'var(--text-muted)', fontSize: '0.85rem',
+                        fontFamily: 'Inter, sans-serif', margin: 0,
                     }}>
-                        © {new Date().getFullYear()} LINZE LOWE CHRIST MAXIME · Douala, Cameroon · All rights reserved.
+                        © {currentYear} LINZE LOWE CHRIST MAXIME. {t.rights}
                     </p>
                     <p style={{
-                        color: '#1e293b', fontSize: '0.75rem', margin: 0,
-                        fontFamily: 'Inter, sans-serif',
+                        color: 'var(--text-muted)', fontSize: '0.85rem',
+                        fontFamily: 'Inter, sans-serif', margin: 0,
                     }}>
-                        Built with ❤️ · Powered by React & TailwindCSS
+                        {t.builtWith}
                     </p>
                 </div>
             </div>
+
+            <style>{`
+        @media (max-width: 640px) {
+          div {
+            --footer-cols: 1fr !important;
+          }
+        }
+      `}</style>
         </footer>
     );
 }

@@ -1,15 +1,153 @@
 @import "tailwindcss";
 
-/* Tailwind v4: class-based dark mode */
-@variant dark (&:where(.dark, .dark *));
+@layer base {
+  :root {
+    --color-brand-cyan: #0284c7;
+    --color-brand-blue: #4f46e5;
+    --color-brand-violet: #7c3aed;
+    --color-brand-emerald: #059669;
+
+    --background: #f8fafc;
+    --foreground: #0f172a;
+
+    --surface: #ffffff;
+    --surface-hover: #f1f5f9;
+
+    --border: rgba(15, 23, 42, 0.1);
+    --border-strong: rgba(15, 23, 42, 0.2);
+
+    --text-muted: #64748b;
+    --text-glass: rgba(15, 23, 42, 0.7);
+
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(15, 23, 42, 0.08);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+
+    --card-bg: rgba(255, 255, 255, 0.70);
+    --card-border: rgba(79, 70, 229, 0.18);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+    --card-hover-border: rgba(79, 70, 229, 0.4);
+    --card-hover-shadow: 0 12px 48px rgba(79, 70, 229, 0.15), 0 0 0 1px rgba(79, 70, 229, 0.1);
+
+    --nav-bg: rgba(248, 250, 252, 0.75);
+    --mobile-nav-bg: rgba(248, 250, 252, 0.96);
+
+    --pill-bg: rgba(79, 70, 229, 0.1);
+    --pill-border: rgba(79, 70, 229, 0.2);
+    --pill-text: #4f46e5;
+    --pill-hover-bg: rgba(79, 70, 229, 0.15);
+    --pill-hover-border: rgba(79, 70, 229, 0.3);
+
+    --tag-bg: rgba(2, 132, 199, 0.1);
+    --tag-border: rgba(2, 132, 199, 0.2);
+    --tag-text: #0284c7;
+
+    --btn-secondary-border: rgba(15, 23, 42, 0.18);
+    --btn-secondary-text: #0f172a;
+    --btn-secondary-hover-bg: rgba(15, 23, 42, 0.05);
+    --btn-secondary-hover-border: rgba(15, 23, 42, 0.3);
+
+    --contact-bg: rgba(255, 255, 255, 0.6);
+    --contact-hover-bg: rgba(2, 132, 199, 0.04);
+    --contact-hover-border: rgba(2, 132, 199, 0.2);
+
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-thumb-hover: #94a3b8;
+
+    --social-bg: rgba(15, 23, 42, 0.04);
+    --social-border: rgba(15, 23, 42, 0.1);
+    --social-text: #475569;
+    --social-hover-bg: rgba(2, 132, 199, 0.08);
+    --social-hover-border: rgba(2, 132, 199, 0.3);
+    --social-hover-text: #0284c7;
+
+    --hero-gradient: linear-gradient(135deg, #0f172a 0%, #4f46e5 45%, #0284c7 100%);
+    --note-bg: rgba(15, 23, 42, 0.03);
+    --note-border: rgba(15, 23, 42, 0.07);
+    --lang-bg: rgba(15, 23, 42, 0.04);
+  }
+
+  .dark {
+    --color-brand-cyan: #22d3ee;
+    --color-brand-blue: #6366f1;
+    --color-brand-violet: #8b5cf6;
+    --color-brand-emerald: #10b981;
+
+    --background: #030014;
+    --foreground: #e2e8f0;
+
+    --surface: #0d0d1a;
+    --surface-hover: #1e1e3a;
+
+    --border: rgba(255, 255, 255, 0.06);
+    --border-strong: rgba(255, 255, 255, 0.1);
+
+    --text-muted: #94a3b8;
+    --text-glass: rgba(255, 255, 255, 0.7);
+
+    --glass-bg: rgba(13, 13, 26, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+
+    --card-bg: rgba(15, 15, 35, 0.70);
+    --card-border: rgba(99, 102, 241, 0.18);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    --card-hover-border: rgba(99, 102, 241, 0.4);
+    --card-hover-shadow: 0 12px 48px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.1);
+
+    --nav-bg: rgba(3, 0, 20, 0.75);
+    --mobile-nav-bg: rgba(3, 0, 20, 0.96);
+
+    --pill-bg: rgba(99, 102, 241, 0.12);
+    --pill-border: rgba(99, 102, 241, 0.25);
+    --pill-text: #c7d2fe;
+    --pill-hover-bg: rgba(99, 102, 241, 0.22);
+    --pill-hover-border: rgba(99, 102, 241, 0.5);
+
+    --tag-bg: rgba(34, 211, 238, 0.12);
+    --tag-border: rgba(34, 211, 238, 0.3);
+    --tag-text: #22d3ee;
+
+    --btn-secondary-border: rgba(255, 255, 255, 0.18);
+    --btn-secondary-text: #e2e8f0;
+    --btn-secondary-hover-bg: rgba(255, 255, 255, 0.07);
+    --btn-secondary-hover-border: rgba(255, 255, 255, 0.35);
+
+    --contact-bg: rgba(15, 15, 35, 0.6);
+    --contact-hover-bg: rgba(34, 211, 238, 0.07);
+    --contact-hover-border: rgba(34, 211, 238, 0.3);
+
+    --scrollbar-thumb: #1e1e3a;
+    --scrollbar-thumb-hover: #6366f1;
+
+    --social-bg: rgba(255, 255, 255, 0.04);
+    --social-border: rgba(255, 255, 255, 0.1);
+    --social-text: #94a3b8;
+    --social-hover-bg: rgba(34, 211, 238, 0.08);
+    --social-hover-border: rgba(34, 211, 238, 0.3);
+    --social-hover-text: #22d3ee;
+
+    --hero-gradient: linear-gradient(135deg, #ffffff 0%, #c7d2fe 45%, #22d3ee 100%);
+    --note-bg: rgba(255, 255, 255, 0.03);
+    --note-border: rgba(255, 255, 255, 0.07);
+    --lang-bg: rgba(255, 255, 255, 0.04);
+  }
+}
 
 @theme {
-  --color-brand-cyan: #22d3ee;
-  --color-brand-blue: #6366f1;
-  --color-brand-violet: #8b5cf6;
-  --color-brand-emerald: #10b981;
-  --color-deep-space: #030014;
-  --color-surface: #0d0d1a;
+  --color-brand-cyan: var(--color-brand-cyan);
+  --color-brand-blue: var(--color-brand-blue);
+  --color-brand-violet: var(--color-brand-violet);
+  --color-brand-emerald: var(--color-brand-emerald);
+  --color-deep-space: var(--background);
+  --color-surface: var(--surface);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-text-muted: var(--text-muted);
 
   --font-heading: "Outfit", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -161,14 +299,13 @@
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark;
 }
 
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
-  background: #030014;
-  color: #e2e8f0;
+  background: var(--background);
+  color: var(--foreground);
   overflow-x: hidden;
 }
 

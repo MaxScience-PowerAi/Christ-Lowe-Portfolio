@@ -11,7 +11,7 @@ function useVisible(threshold = 0.15) {
     return { ref, visible };
 }
 
-export function AboutSection() {
+export function AboutSection({ t }: { t: any }) {
     const { ref, visible } = useVisible();
 
     return (
@@ -37,20 +37,20 @@ export function AboutSection() {
                 {/* Section Header */}
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                     <span style={{
-                        color: '#6366f1', fontWeight: 700, fontSize: '0.78rem',
+                        color: 'var(--color-brand-blue)', fontWeight: 700, fontSize: '0.78rem',
                         letterSpacing: '0.18em', textTransform: 'uppercase',
                         fontFamily: 'Outfit, sans-serif',
                     }}>
-                        01 · About
+                        {t.tag}
                     </span>
                     <h2 style={{
                         fontFamily: 'Outfit, sans-serif', fontWeight: 800,
                         fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
                         margin: '0.5rem 0 0',
-                        background: 'linear-gradient(135deg, #ffffff, #c7d2fe)',
+                        background: 'var(--hero-gradient)',
                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     }}>
-                        About Me
+                        {t.title}
                     </h2>
                     <div className="section-divider" style={{ margin: '0.75rem auto 0' }} />
                 </div>
@@ -64,36 +64,50 @@ export function AboutSection() {
                     {/* Left – Photo + quick facts */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                         {/* Avatar */}
-                        <div className="avatar-ring" style={{ width: 'fit-content' }}>
-                            <img
-                                src="/avatar.png"
-                                alt="LINZE LOWE CHRIST MAXIME"
-                                style={{
-                                    width: 200, height: 200, borderRadius: '50%',
-                                    objectFit: 'cover', display: 'block',
-                                }}
-                                onError={e => {
-                                    // Fallback if image missing
-                                    const el = e.currentTarget;
-                                    el.style.display = 'none';
-                                }}
-                            />
-                        </div>
-
-                        {/* Fallback initials avatar shown via CSS if image missing */}
-                        <div style={{ display: 'none' }} aria-hidden="true" className="avatar-fallback">
+                        <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
+                            <div className="avatar-ring" style={{ width: 'fit-content' }}>
+                                <img
+                                    src="/maxime.jpg"
+                                    alt="Christ Lowe – LINZE LOWE CHRIST MAXIME"
+                                    style={{
+                                        width: 240, height: 240, borderRadius: '50%',
+                                        objectFit: 'cover', objectPosition: 'top center',
+                                        display: 'block',
+                                        transition: 'transform 0.4s ease, box-shadow 0.4s ease',
+                                    }}
+                                    onMouseEnter={e => {
+                                        (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)';
+                                        (e.currentTarget as HTMLElement).style.boxShadow = '0 0 40px rgba(34,211,238,0.35)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                                        (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                                    }}
+                                />
+                            </div>
+                            {/* Online indicator */}
                             <div style={{
-                                width: 200, height: 200, borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 50%, #8b5cf6 100%)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '3.5rem', fontWeight: 900, color: 'white', fontFamily: 'Outfit, sans-serif',
-                            }}>
-                                LM
+                                position: 'absolute', bottom: 12, right: 12,
+                                width: 20, height: 20, borderRadius: '50%',
+                                background: 'var(--color-brand-emerald)',
+                                border: '3px solid var(--color-background)',
+                                boxShadow: '0 0 10px var(--color-brand-emerald)',
+                            }} />
+                        </div>
+                        {/* Name tag below avatar */}
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{
+                                fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.05rem',
+                                background: 'linear-gradient(90deg, var(--color-brand-cyan), var(--color-brand-blue))',
+                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                            }}>Christ Lowe</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
+                                AI Engineer · Douala 🇨🇲
                             </div>
                         </div>
 
                         {/* Quick facts card */}
-                        <div className="glass-card" style={{ borderRadius: '1rem', padding: '1.25rem', width: '100%' }}>
+                        <div className="glass-card" style={{ borderRadius: '1rem', padding: '1.25rem', width: '100%', background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
                             {[
                                 { icon: '🎓', label: 'Level 3 Mathematics', sub: 'University of Douala' },
                                 { icon: '📍', label: 'Douala, Cameroon', sub: 'Available remote / on-site' },
@@ -103,12 +117,12 @@ export function AboutSection() {
                                 <div key={f.label} style={{
                                     display: 'flex', alignItems: 'center', gap: '0.75rem',
                                     padding: '0.65rem 0',
-                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid var(--border)',
                                 }}>
                                     <span style={{ fontSize: '1.2rem' }}>{f.icon}</span>
                                     <div>
-                                        <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>{f.label}</div>
-                                        <div style={{ color: '#64748b', fontWeight: 400, fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>{f.sub}</div>
+                                        <div style={{ color: 'var(--color-foreground)', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>{f.label}</div>
+                                        <div style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>{f.sub}</div>
                                     </div>
                                 </div>
                             ))}
@@ -118,23 +132,19 @@ export function AboutSection() {
                     {/* Right – Bio text */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         <p style={{
-                            color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.85,
+                            color: 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.85,
                             fontFamily: 'Inter, sans-serif', margin: 0,
-                        }}>
-                            My name is <strong style={{ color: '#e2e8f0' }}>LINZE LOWE CHRIST MAXIME</strong>, and I am a Level 3 mathematics student at the <strong style={{ color: '#22d3ee' }}>University of Douala</strong> in Cameroon. I love everything related to data, AI, code, maths and building new things.
-                        </p>
+                        }} dangerouslySetInnerHTML={{ __html: t.intro }} />
                         <p style={{
-                            color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.85,
+                            color: 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.85,
                             fontFamily: 'Inter, sans-serif', margin: 0,
-                        }}>
-                            I am currently looking for an internship, opportunities to work in AI and Data Science, and ways to help Africa and develop my country by introducing people to artificial intelligence and data. My faith in God is the engine that drives me toward my goals. With a sharp mindset, I learn and grow very fast.
-                        </p>
+                        }} dangerouslySetInnerHTML={{ __html: t.intro2 }} />
 
                         {/* "What I'm looking for" card */}
                         <div style={{
                             borderRadius: '1rem', padding: '1.5rem',
-                            background: 'linear-gradient(135deg, rgba(34,211,238,0.06) 0%, rgba(99,102,241,0.06) 100%)',
-                            border: '1px solid rgba(34,211,238,0.18)',
+                            background: 'var(--note-bg)',
+                            border: '1px solid var(--note-border)',
                         }}>
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: '0.6rem',
@@ -142,35 +152,36 @@ export function AboutSection() {
                             }}>
                                 <span style={{ fontSize: '1.1rem' }}>🎯</span>
                                 <span style={{
-                                    color: '#22d3ee', fontWeight: 700, fontSize: '0.9rem',
+                                    color: 'var(--color-brand-cyan)', fontWeight: 700, fontSize: '0.9rem',
                                     fontFamily: 'Outfit, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em',
                                 }}>
-                                    What I'm Looking For Now
+                                    {t.lookingFor.title}
                                 </span>
                             </div>
-                            <p style={{
-                                color: '#aab4be', fontSize: '0.97rem', lineHeight: 1.75,
-                                margin: 0, fontFamily: 'Inter, sans-serif',
-                            }}>
-                                I am currently looking for an <strong style={{ color: '#e2e8f0' }}>internship in AI / Data Science</strong> (remote or in Douala). I am also looking for <strong style={{ color: '#e2e8f0' }}>AI comrades</strong> to exchange with, and <strong style={{ color: '#e2e8f0' }}>mentors</strong> whose stories and experiences I can listen to, learn from, and understand.
-                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                                {t.lookingFor.items.map((item: any, i: number) => (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                                        <span style={{ color: 'var(--color-brand-cyan)', marginTop: '0.1rem' }}>✓</span>
+                                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.95rem' }}>
+                                            <strong style={{ color: 'var(--color-foreground)' }}>{item.label} : </strong>
+                                            <span style={{ color: 'var(--text-muted)' }}>{item.value}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Languages */}
                         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                            {[
-                                { flag: '🇬🇧', lang: 'English', level: 'Fluent' },
-                                { flag: '🇫🇷', lang: 'French', level: 'Fluent' },
-                            ].map(l => (
+                            {t.langs.map((l: any) => (
                                 <div key={l.lang} style={{
                                     display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.5rem 1rem', borderRadius: 9999,
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    padding: '0.4rem 0.85rem', borderRadius: '0.5rem',
+                                    background: 'var(--glass-bg)', border: '1px solid var(--border)',
                                 }}>
                                     <span>{l.flag}</span>
-                                    <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>{l.lang}</span>
-                                    <span style={{ color: '#22d3ee', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>{l.level}</span>
+                                    <span style={{ color: 'var(--color-foreground)', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>{l.lang}</span>
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>— {l.level}</span>
                                 </div>
                             ))}
                         </div>

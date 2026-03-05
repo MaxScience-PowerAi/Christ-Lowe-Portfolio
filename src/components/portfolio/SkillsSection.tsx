@@ -11,38 +11,7 @@ function useVisible(threshold = 0.15) {
     return { ref, visible };
 }
 
-const SKILL_GROUPS = [
-    {
-        icon: '💻',
-        title: 'Programming',
-        color: '#22d3ee',
-        gradient: 'from-cyan to-blue',
-        skills: ['Python', 'HTML', 'CSS', 'JavaScript (basics)', 'Markdown'],
-    },
-    {
-        icon: '🤖',
-        title: 'Data / AI',
-        color: '#8b5cf6',
-        gradient: 'from-violet to-purple',
-        skills: ['TensorFlow', 'Keras', 'PyTorch', 'Transfer Learning', 'Deep Learning', 'Data Analysis (Pandas, NumPy)'],
-    },
-    {
-        icon: '🛠️',
-        title: 'Tools & Platforms',
-        color: '#10b981',
-        gradient: 'from-emerald to-green',
-        skills: ['Google Colab', 'GitHub', 'Excel', 'PowerPoint', 'VS Code'],
-    },
-    {
-        icon: '🌟',
-        title: 'Soft Skills',
-        color: '#f59e0b',
-        gradient: 'from-amber to-yellow',
-        skills: ['Fast Learner', 'Teamwork', 'Autonomy', 'Easy Integration', 'Adaptability', 'Problem Solving'],
-    },
-];
-
-export function SkillsSection() {
+export function SkillsSection({ t }: { t: any }) {
     const { ref, visible } = useVisible();
 
     return (
@@ -61,22 +30,22 @@ export function SkillsSection() {
                 {/* Section Header */}
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
                     <span style={{
-                        color: '#8b5cf6', fontWeight: 700, fontSize: '0.78rem',
+                        color: 'var(--color-brand-violet)', fontWeight: 700, fontSize: '0.78rem',
                         letterSpacing: '0.18em', textTransform: 'uppercase',
                         fontFamily: 'Outfit, sans-serif',
                     }}>
-                        02 · Skills
+                        {t.tag}
                     </span>
                     <h2 style={{
                         fontFamily: 'Outfit, sans-serif', fontWeight: 800,
                         fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
                         margin: '0.5rem 0 0',
-                        background: 'linear-gradient(135deg, #ffffff, #c7d2fe)',
+                        background: 'var(--hero-gradient)',
                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                     }}>
-                        Skills & Expertise
+                        {t.title}
                     </h2>
-                    <div className="section-divider" style={{ background: 'linear-gradient(90deg, #8b5cf6, #6366f1)', margin: '0.75rem auto 0' }} />
+                    <div className="section-divider" style={{ background: 'linear-gradient(90deg, var(--color-brand-violet), var(--color-brand-blue))', margin: '0.75rem auto 0' }} />
                 </div>
 
                 {/* Skill cards grid */}
@@ -86,7 +55,7 @@ export function SkillsSection() {
                     gap: '1.5rem',
                     marginBottom: '3rem',
                 }}>
-                    {SKILL_GROUPS.map((group, gi) => (
+                    {t.groups.map((group: any, gi: number) => (
                         <div
                             key={group.title}
                             className="glass-card"
@@ -95,15 +64,17 @@ export function SkillsSection() {
                                 opacity: visible ? 1 : 0,
                                 transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
                                 transition: `opacity 0.6s ease ${gi * 0.12}s, transform 0.6s ease ${gi * 0.12}s`,
-                                borderTopColor: `${group.color}22`,
+                                borderTopColor: group.color, // Slightly tint the top border
+                                background: 'var(--card-bg)',
+                                border: '1px solid var(--border)',
                             }}
                         >
                             {/* Card header */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
                                 <div style={{
                                     width: 44, height: 44, borderRadius: '0.85rem',
-                                    background: `${group.color}15`,
-                                    border: `1px solid ${group.color}30`,
+                                    background: 'var(--glass-bg)',
+                                    border: `1px solid var(--border-strong)`,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: '1.3rem', flexShrink: 0,
                                 }}>
@@ -125,9 +96,9 @@ export function SkillsSection() {
                                         style={{
                                             display: 'inline-block',
                                             padding: '0.3rem 0.8rem', borderRadius: 9999,
-                                            background: `${group.color}10`,
-                                            border: `1px solid ${group.color}25`,
-                                            color: '#c7d2fe',
+                                            background: 'var(--pill-bg)',
+                                            border: `1px solid var(--pill-border)`,
+                                            color: 'var(--color-foreground)',
                                             fontSize: '0.8rem', fontWeight: 600,
                                             fontFamily: 'Inter, sans-serif',
                                         }}
@@ -145,15 +116,15 @@ export function SkillsSection() {
                     textAlign: 'center',
                     padding: '1rem 2rem',
                     borderRadius: '0.75rem',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.07)',
+                    background: 'var(--note-bg)',
+                    border: '1px solid var(--note-border)',
                     maxWidth: 700, margin: '0 auto',
                 }}>
                     <p style={{
-                        color: '#64748b', fontSize: '0.9rem', margin: 0,
+                        color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0,
                         fontFamily: 'Inter, sans-serif', lineHeight: 1.7, fontStyle: 'italic',
                     }}>
-                        ✨ These are my main skills, but I am <strong style={{ color: '#94a3b8' }}>continuously learning and exploring</strong> new tools and technologies every day.
+                        ✨ These are my main skills, but I am <strong style={{ color: 'var(--color-foreground)' }}>continuously learning and exploring</strong> new tools and technologies every day.
                     </p>
                 </div>
             </div>

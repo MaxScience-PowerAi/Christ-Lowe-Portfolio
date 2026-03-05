@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
     id: i,
@@ -7,10 +7,10 @@ const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
     size: Math.random() * 3 + 1,
     delay: Math.random() * 5,
     duration: Math.random() * 4 + 4,
-    color: i % 3 === 0 ? '#22d3ee' : i % 3 === 1 ? '#6366f1' : '#8b5cf6',
+    color: i % 3 === 0 ? 'var(--color-brand-cyan)' : i % 3 === 1 ? 'var(--color-brand-blue)' : 'var(--color-brand-violet)',
 }));
 
-export function HeroSection() {
+export function HeroSection({ t }: { t: any }) {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
@@ -68,8 +68,8 @@ export function HeroSection() {
             <div style={{
                 position: 'absolute', inset: 0, pointerEvents: 'none',
                 backgroundImage: `
-          linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px)
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px)
         `,
                 backgroundSize: '60px 60px',
             }} />
@@ -85,13 +85,13 @@ export function HeroSection() {
                 <div style={{
                     display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.4rem 1.1rem', borderRadius: 9999,
-                    background: 'rgba(34,211,238,0.08)',
-                    border: '1px solid rgba(34,211,238,0.25)',
+                    background: 'var(--tag-bg)',
+                    border: '1px solid var(--tag-border)',
                     marginBottom: '1.5rem',
                 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22d3ee', display: 'inline-block', boxShadow: '0 0 8px #22d3ee' }} />
-                    <span style={{ color: '#22d3ee', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
-                        Open to Internship · Douala, Cameroon
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-brand-cyan)', display: 'inline-block', boxShadow: '0 0 8px var(--color-brand-cyan)', animation: 'pulse 2s infinite' }} />
+                    <span style={{ color: 'var(--color-brand-cyan)', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
+                        {t.badge}
                     </span>
                 </div>
 
@@ -99,36 +99,64 @@ export function HeroSection() {
                 <h1 style={{
                     fontFamily: 'Outfit, sans-serif',
                     fontWeight: 900,
-                    fontSize: 'clamp(2rem, 6vw, 4.5rem)',
-                    lineHeight: 1.1,
-                    margin: '0 0 1.25rem',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #c7d2fe 45%, #22d3ee 100%)',
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                    fontSize: 'clamp(2.2rem, 6.5vw, 5rem)',
+                    lineHeight: 1.05,
+                    margin: '0 0 0.5rem',
                     letterSpacing: '-0.02em',
                 }}>
-                    LINZE LOWE<br />
+                    {t.greeting}{' '}
                     <span style={{
-                        background: 'linear-gradient(90deg, #22d3ee, #6366f1, #8b5cf6)',
+                        background: 'var(--hero-gradient)',
                         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>CHRIST MAXIME</span>
+                    }}>
+                        Christ Lowe
+                    </span>
                 </h1>
+                {/* Full legal name subtitle */}
+                <p style={{
+                    fontFamily: 'Outfit, sans-serif', fontWeight: 600,
+                    fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+                    color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase',
+                    margin: '0 0 1.1rem',
+                }}>
+                    LINZE LOWE CHRIST MAXIME
+                </p>
+                {/* Animated title tags */}
+                <div style={{
+                    display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
+                    justifyContent: 'center', marginBottom: '1.5rem',
+                }}>
+                    {['🤖 AI Engineer', '📐 Math Student', '🌍 Douala, Cameroon', '🚀 PowerAi Co-founder'].map((tag, i) => (
+                        <span key={tag} style={{
+                            padding: '0.3rem 0.9rem', borderRadius: 9999,
+                            fontSize: '0.8rem', fontWeight: 600,
+                            fontFamily: 'Inter, sans-serif',
+                            background: i % 2 === 0 ? 'var(--pill-bg)' : 'var(--tag-bg)',
+                            border: `1px solid ${i % 2 === 0 ? 'var(--pill-border)' : 'var(--tag-border)'}`,
+                            color: i % 2 === 0 ? 'var(--pill-text)' : 'var(--tag-text)',
+                        }}>
+                            {tag}
+                        </span>
+                    ))}
+                </div>
 
                 {/* Hero text */}
-                <p style={{
-                    color: '#94a3b8',
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
-                    lineHeight: 1.75,
-                    maxWidth: 700, margin: '0 auto 1rem',
-                    fontFamily: 'Inter, sans-serif', fontWeight: 400,
+                <h2 style={{
+                    color: 'var(--color-foreground)', fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+                    fontFamily: 'Inter, sans-serif', fontWeight: 600, margin: '0 0 1rem',
                 }}>
-                    Level 3 math student, AI and data enthusiast in Douala — one of the co‑founders of an emerging AI community that wants to lead{' '}
-                    <span style={{ color: '#22d3ee', fontWeight: 600 }}>Cameroon</span> and later{' '}
-                    <span style={{ color: '#8b5cf6', fontWeight: 600 }}>Africa</span> into a new era of artificial intelligence.
+                    {t.role}
+                </h2>
+                <p style={{
+                    color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: 1.7,
+                    fontFamily: 'Inter, sans-serif', maxWidth: 640, margin: '0 auto 2.5rem',
+                }}>
+                    {t.sub}
                 </p>
 
                 {/* Sub-subtitle */}
                 <p style={{
-                    color: '#64748b',
+                    color: 'var(--text-muted)',
                     fontSize: '0.95rem',
                     marginBottom: '2.5rem',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
@@ -138,18 +166,22 @@ export function HeroSection() {
 
                 {/* CTA Buttons */}
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-                    <button onClick={scrollToProjects} className="btn-primary" style={{ fontSize: '1rem', padding: '0.85rem 2rem' }}>
-                        <span>View my projects</span>
-                        <span>→</span>
+                    <button onClick={scrollToProjects} className="btn-primary" style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem' }}>
+                        {t.cta1} &nbsp; <span>↓</span>
                     </button>
-                    <a
-                        href="/CV_LINZE_LOWE_CHRIST_MAXIME.pdf"
-                        download
-                        className="btn-secondary"
-                        style={{ fontSize: '1rem', padding: '0.85rem 2rem' }}
+                    <a href="#contact"
+                        onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
+                        style={{
+                            padding: '0.9rem 2.2rem', borderRadius: 9999,
+                            background: 'var(--glass-bg)', border: '1px solid var(--border)',
+                            color: 'var(--color-foreground)', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '1.05rem',
+                            display: 'flex', alignItems: 'center', transition: 'all 0.3s',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                        }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--text-muted)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
                     >
-                        <span>⬇</span>
-                        <span>Download CV</span>
+                        {t.cta2}
                     </a>
                 </div>
 
@@ -169,22 +201,22 @@ export function HeroSection() {
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.4rem',
                                 padding: '0.45rem 1rem', borderRadius: 9999,
-                                background: 'rgba(255,255,255,0.04)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: '#94a3b8', textDecoration: 'none',
+                                background: 'var(--social-bg)',
+                                border: '1px solid var(--social-border)',
+                                color: 'var(--social-text)', textDecoration: 'none',
                                 fontSize: '0.82rem', fontWeight: 600,
                                 transition: 'all 0.2s',
                                 fontFamily: 'Inter, sans-serif',
                             }}
                             onMouseEnter={e => {
-                                (e.currentTarget as HTMLElement).style.background = 'rgba(34,211,238,0.08)';
-                                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(34,211,238,0.3)';
-                                (e.currentTarget as HTMLElement).style.color = '#22d3ee';
+                                (e.currentTarget as HTMLElement).style.background = 'var(--social-hover-bg)';
+                                (e.currentTarget as HTMLElement).style.borderColor = 'var(--social-hover-border)';
+                                (e.currentTarget as HTMLElement).style.color = 'var(--social-hover-text)';
                             }}
                             onMouseLeave={e => {
-                                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
-                                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)';
-                                (e.currentTarget as HTMLElement).style.color = '#94a3b8';
+                                (e.currentTarget as HTMLElement).style.background = 'var(--social-bg)';
+                                (e.currentTarget as HTMLElement).style.borderColor = 'var(--social-border)';
+                                (e.currentTarget as HTMLElement).style.color = 'var(--social-text)';
                             }}
                         >
                             <span>{s.icon}</span>
@@ -196,16 +228,16 @@ export function HeroSection() {
                 {/* Scroll indicator */}
                 <div style={{
                     marginTop: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                    color: '#475569', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                    color: 'var(--text-muted)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase',
                     fontFamily: 'Inter, sans-serif',
                 }}>
                     <span>Scroll to explore</span>
                     <div style={{
-                        width: 24, height: 38, border: '2px solid rgba(255,255,255,0.12)',
+                        width: 24, height: 38, border: '2px solid var(--border)',
                         borderRadius: 12, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '0.3rem',
                     }}>
                         <div style={{
-                            width: 3, height: 8, background: 'linear-gradient(180deg, #22d3ee, #6366f1)',
+                            width: 3, height: 8, background: 'linear-gradient(180deg, var(--color-brand-cyan), var(--color-brand-blue))',
                             borderRadius: 9999,
                             animation: 'float 2s ease-in-out infinite',
                         }} />
@@ -217,6 +249,10 @@ export function HeroSection() {
         @keyframes particle {
           from { transform: translateY(0) scale(1); opacity: 0.4; }
           to   { transform: translateY(-30px) scale(0.6); opacity: 0; }
+        }
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 0 6px var(--color-brand-cyan); }
+          50% { box-shadow: 0 0 16px var(--color-brand-cyan), 0 0 30px var(--tag-bg); }
         }
       `}</style>
         </div>
