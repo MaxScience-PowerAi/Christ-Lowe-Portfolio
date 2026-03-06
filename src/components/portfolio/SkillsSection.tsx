@@ -1,144 +1,138 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-function useVisible(threshold = 0.15) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
 
 export function SkillsSection({ t }: { t: any }) {
-    const { ref, visible } = useVisible();
+    // Extract all skills for the marquee
+    const allSkills = t.groups ? t.groups.flatMap((g: any) => g.skills) : [];
 
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(99,102,241,0.07) 0%, transparent 70%)',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
-            <div className="container-xl">
-                {/* Section Header */}
-                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-violet)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase',
-                        fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
-                    </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
-                        margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
-                    </h2>
-                    <div className="section-divider" style={{ background: 'linear-gradient(90deg, var(--color-brand-violet), var(--color-brand-blue))', margin: '0.75rem auto 0' }} />
+        <section id="skills" className="section-pad relative overflow-hidden bg-background">
+            {/* Background accent */}
+            <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-brand-violet/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
+            {/* Infinite Marquee */}
+            <div className="w-full relative py-10 mb-8 border-y border-border/50 bg-surface/30 overflow-hidden flex">
+                <div className="flex w-max animate-marquee space-x-8 pr-8">
+                    {[...allSkills, ...allSkills, ...allSkills].map((skill, index) => (
+                        <div key={index} className="flex items-center gap-3">
+                            <span className="text-muted text-sm font-heading font-bold uppercase tracking-widest">{skill}</span>
+                            <span className="text-brand-cyan/50">✦</span>
+                        </div>
+                    ))}
                 </div>
+            </div>
+
+            <div className="container-xl relative z-10 max-w-6xl mx-auto px-4">
+                {/* Section Header */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-16"
+                >
+                    <span className="text-brand-violet font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
+                    </span>
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
+                    </h2>
+                    <div className="w-24 h-1 bg-gradient-to-r from-brand-violet to-brand-blue mx-auto mt-6 rounded-full" />
+                </motion.div>
 
                 {/* Skill cards grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-                    gap: '1.5rem',
-                    marginBottom: '3rem',
-                }}>
-                    {t.groups.map((group: any, gi: number) => (
-                        <div
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={staggerContainer}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+                >
+                    {(t.groups || []).map((group: any, gi: number) => (
+                        <motion.div
                             key={group.title}
-                            className="glass-card"
-                            style={{
-                                borderRadius: '1.25rem', padding: '1.75rem',
-                                opacity: visible ? 1 : 0,
-                                transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
-                                transition: `opacity 0.6s ease ${gi * 0.12}s, transform 0.6s ease ${gi * 0.12}s`,
-                                borderTopColor: group.color, // Slightly tint the top border
-                                background: 'var(--card-bg)',
-                                border: '1px solid var(--border)',
-                            }}
+                            variants={fadeUp}
+                            className="glass-card relative overflow-hidden group p-8 flex flex-col h-full border-t flex-1"
+                            style={{ borderTopColor: group.color ? `${group.color}40` : 'var(--border)' }}
                         >
+                            {/* Hover Gradient Background */}
+                            <div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
+                                style={{ background: `radial-gradient(circle at center, ${group.color || 'var(--brand-cyan)'}, transparent 70%)` }}
+                            />
+
                             {/* Card header */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                                <div style={{
-                                    width: 44, height: 44, borderRadius: '0.85rem',
-                                    background: 'var(--glass-bg)',
-                                    border: `1px solid var(--border-strong)`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: '1.3rem', flexShrink: 0,
-                                }}>
-                                    {group.icon}
-                                </div>
-                                <h3 style={{
-                                    fontFamily: 'Outfit, sans-serif', fontWeight: 700,
-                                    fontSize: '1.05rem', color: group.color, margin: 0,
-                                }}>
-                                    {group.title}
+                            <div className="flex items-center gap-4 mb-8">
+                                <Magnetic strength={0.4}>
+                                    <div className="w-12 h-12 rounded-xl bg-surface-hover border border-border flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                                        {group.icon}
+                                    </div>
+                                </Magnetic>
+                                <h3
+                                    className="font-heading font-bold text-lg"
+                                    style={{ color: group.color || 'var(--color-foreground)' }}
+                                >
+                                    <SplitText text={group.title} delay={0.2} />
                                 </h3>
                             </div>
 
-                            {/* Skills list */}
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                {group.skills.map(skill => (
+                            {/* Skills tags */}
+                            <div className="flex flex-wrap gap-2.5 flex-1 content-start">
+                                {group.skills.map((skill: string) => (
                                     <span
                                         key={skill}
-                                        style={{
-                                            display: 'inline-block',
-                                            padding: '0.3rem 0.8rem', borderRadius: 9999,
-                                            background: 'var(--pill-bg)',
-                                            border: `1px solid var(--pill-border)`,
-                                            color: 'var(--color-foreground)',
-                                            fontSize: '0.8rem', fontWeight: 600,
-                                            fontFamily: 'Inter, sans-serif',
-                                        }}
+                                        className="inline-block px-3 py-1.5 rounded-lg bg-surface-hover border border-border/50 text-foreground text-xs font-semibold font-body transition-colors hover:border-brand-cyan/50 hover:text-brand-cyan cursor-default"
                                     >
                                         {skill}
                                     </span>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Bottom note */}
-                <div style={{
-                    textAlign: 'center',
-                    padding: '1rem 2rem',
-                    borderRadius: '0.75rem',
-                    background: 'var(--note-bg)',
-                    border: '1px solid var(--note-border)',
-                    maxWidth: 700, margin: '0 auto',
-                }}>
-                    <p style={{
-                        color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0,
-                        fontFamily: 'Inter, sans-serif', lineHeight: 1.7, fontStyle: 'italic',
-                    }}>
-                        ✨ {t.note && t.noteHighlight
-                            ? t.note.split(t.noteHighlight).map((part: string, i: number) =>
-                                i === 0
-                                    ? <span key={i}>{part.replace('✨ ', '')}</span>
-                                    : <span key={i}>{part}</span>
-                            ).reduce((acc: any[], part: any, i: number) => {
-                                if (i > 0) acc.push(<strong key={`h${i}`} style={{ color: 'var(--color-foreground)' }}>{t.noteHighlight}</strong>);
-                                acc.push(part);
-                                return acc;
-                            }, [])
-                            : t.note
-                        }
-                    </p>
-                </div>
+                {t.note && (
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeUp}
+                        className="text-center p-6 md:p-8 rounded-2xl bg-cyan-500/5 border border-cyan-500/20 max-w-3xl mx-auto backdrop-blur-sm"
+                    >
+                        <p className="text-muted text-sm md:text-base font-body leading-relaxed max-w-2xl mx-auto">
+                            <span className="text-xl inline-block mr-2 align-middle">✨</span>
+                            {t.noteHighlight ? (
+                                t.note.split(t.noteHighlight).map((part: string, i: number) => (
+                                    <React.Fragment key={i}>
+                                        {i === 0 ? part.replace('✨ ', '') : part}
+                                        {i === 0 && <strong className="text-foreground font-semibold px-1">{t.noteHighlight}</strong>}
+                                    </React.Fragment>
+                                ))
+                            ) : (
+                                t.note.replace('✨ ', '')
+                            )}
+                        </p>
+                    </motion.div>
+                )}
             </div>
-        </div>
+
+            <style>{`
+                @keyframes marquee {
+                    0% { transform: translateX(0%); }
+                    100% { transform: translateX(-33.33%); }
+                }
+                .animate-marquee {
+                    animation: marquee 20s linear infinite;
+                }
+                .animate-marquee:hover {
+                    animation-play-state: paused;
+                }
+            `}</style>
+        </section>
     );
 }

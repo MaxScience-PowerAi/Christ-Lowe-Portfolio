@@ -1,201 +1,143 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-function useVisible(threshold = 0.15) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
 
 export function AboutSection({ t }: { t: any }) {
-    const { ref, visible } = useVisible();
-
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
+        <section id="about" className="section-pad relative overflow-hidden bg-surface">
             {/* Background accent */}
-            <div style={{
-                position: 'absolute', top: 0, left: '-20%',
-                width: '60%', height: '100%',
-                background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.06) 0%, transparent 70%)',
-                pointerEvents: 'none',
-            }} />
+            <div className="absolute top-0 left-[-20%] w-[60%] h-full bg-radial-gradient from-indigo-500/5 to-transparent pointer-events-none" />
 
-            <div className="container-xl">
+            <div className="container-xl relative z-10 max-w-6xl mx-auto px-4">
                 {/* Section Header */}
-                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-blue)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase',
-                        fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-16"
+                >
+                    <span className="text-brand-blue font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
                     </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
-                        margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
                     </h2>
-                    <div className="section-divider" style={{ margin: '0.75rem auto 0' }} />
-                </div>
+                    <div className="section-divider mx-auto mt-3" />
+                </motion.div>
 
-                {/* Main grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'var(--about-cols, 1fr 1.6fr)',
-                    gap: '3rem', alignItems: 'start',
-                }}>
-                    {/* Left – Photo + quick facts */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-                        {/* Avatar */}
-                        <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
-                            <div className="avatar-ring" style={{ width: 'fit-content' }}>
+                {/* Bento Grid */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={staggerContainer}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                >
+                    {/* 1. Photo & Intro Card (Spans 1 col, 2 rows on large screens) */}
+                    <motion.div variants={fadeUp} className="glass-card p-8 flex flex-col items-center text-center md:row-span-2 justify-center relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        <div className="relative mb-6">
+                            <div className="w-[180px] h-[180px] rounded-full p-1 bg-gradient-to-tr from-cyan-500 to-blue-600">
                                 <img
                                     src="/avatar.webp"
-                                    alt="Christ Lowe – LINZE LOWE CHRIST MAXIME"
-                                    style={{
-                                        width: 240, height: 240, borderRadius: '50%',
-                                        objectFit: 'cover', objectPosition: 'top center',
-                                        display: 'block',
-                                        transition: 'transform 0.4s ease, box-shadow 0.4s ease',
-                                    }}
-                                    onMouseEnter={e => {
-                                        (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)';
-                                        (e.currentTarget as HTMLElement).style.boxShadow = '0 0 40px rgba(34,211,238,0.35)';
-                                    }}
-                                    onMouseLeave={e => {
-                                        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-                                        (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                                    }}
+                                    alt="Christ Lowe"
+                                    className="w-full h-full rounded-full object-cover object-top border-4 border-surface"
+                                    loading="lazy"
                                 />
                             </div>
                             {/* Online indicator */}
-                            <div style={{
-                                position: 'absolute', bottom: 12, right: 12,
-                                width: 20, height: 20, borderRadius: '50%',
-                                background: 'var(--color-brand-emerald)',
-                                border: '3px solid var(--color-background)',
-                                boxShadow: '0 0 10px var(--color-brand-emerald)',
-                            }} />
-                        </div>
-                        {/* Name tag below avatar */}
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{
-                                fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.05rem',
-                                background: 'linear-gradient(90deg, var(--color-brand-cyan), var(--color-brand-blue))',
-                                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                            }}>Christ Lowe</div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif', letterSpacing: '0.05em' }}>
-                                {t.subtitle || 'AI Engineer · Douala 🇨🇲'}
-                            </div>
+                            <div className="absolute bottom-2 right-4 w-5 h-5 rounded-full bg-emerald-400 border-[3px] border-surface shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
                         </div>
 
-                        {/* Quick facts card */}
-                        <div className="glass-card" style={{ borderRadius: '1rem', padding: '1.25rem', width: '100%', background: 'var(--card-bg)', border: '1px solid var(--border)' }}>
+                        <h3 className="font-heading font-bold text-xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-1">
+                            <SplitText text="Christ Lowe" />
+                        </h3>
+                        <p className="text-muted text-xs font-body tracking-[0.05em] uppercase">
+                            <SplitText text={t.subtitle || 'AI Engineer · Douala 🇨🇲'} delay={0.5} />
+                        </p>
+                    </motion.div>
+
+                    {/* 2. Bio Card (Spans 2 cols) */}
+                    <motion.div variants={fadeUp} className="glass-card p-8 md:col-span-2 flex flex-col justify-center relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-violet/5 rounded-full blur-3xl group-hover:bg-brand-violet/10 transition-colors duration-500" />
+                        <h4 className="font-heading font-bold text-lg text-foreground mb-4 flex items-center gap-2">
+                            <span className="text-brand-cyan">✦</span> {t.introTitle || 'Who am I?'}
+                        </h4>
+                        <div className="space-y-4 font-body text-muted leading-relaxed text-[0.95rem] md:text-base relative z-10">
+                            <p>{t.intro}</p>
+                            <p>{t.intro2}</p>
+                        </div>
+                    </motion.div>
+
+                    {/* 3. Quick Facts Card */}
+                    <motion.div variants={fadeUp} className="glass-card p-6 md:col-span-1 lg:col-span-1 flex flex-col justify-center">
+                        <div className="space-y-4 divide-y divide-border/50">
                             {(t.quickFacts || [
                                 { icon: '🎓', label: 'Level 3 Mathematics', sub: 'University of Douala' },
                                 { icon: '📍', label: 'Douala, Cameroon', sub: 'Available remote / on-site' },
                                 { icon: '🚀', label: 'Co-founder', sub: 'PowerAi Community' },
                                 { icon: '✝️', label: 'Faith-driven', sub: 'God is my engine' },
-                            ]).map((f: any) => (
-                                <div key={f.label} style={{
-                                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                                    padding: '0.65rem 0',
-                                    borderBottom: '1px solid var(--border)',
-                                }}>
-                                    <span style={{ fontSize: '1.2rem' }}>{f.icon}</span>
+                            ]).map((f: any, i: number) => (
+                                <div key={i} className="flex items-center gap-4 pt-4 first:pt-0">
+                                    <div className="w-10 h-10 rounded-xl bg-surface-hover flex items-center justify-center text-lg shadow-inner">
+                                        {f.icon}
+                                    </div>
                                     <div>
-                                        <div style={{ color: 'var(--color-foreground)', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>{f.label}</div>
-                                        <div style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>{f.sub}</div>
+                                        <div className="text-foreground font-semibold text-sm font-body">{f.label}</div>
+                                        <div className="text-muted text-xs font-body mt-0.5">{f.sub}</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
 
-                    {/* Right – Bio text */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        <p style={{
-                            color: 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.85,
-                            fontFamily: 'Inter, sans-serif', margin: 0,
-                        }}>{t.intro}</p>
-                        <p style={{
-                            color: 'var(--color-text-muted)', fontSize: '1.05rem', lineHeight: 1.85,
-                            fontFamily: 'Inter, sans-serif', margin: 0,
-                        }}>{t.intro2}</p>
+                    {/* 4. What I'm Looking For Card */}
+                    <motion.div variants={fadeUp} className="glass-card p-6 md:col-span-1 lg:col-span-1 border-brand-cyan/20 bg-brand-cyan/5 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-5">
+                            <span className="text-xl">🎯</span>
+                            <span className="text-brand-cyan font-bold text-sm font-heading uppercase tracking-widest">
+                                {t.lookingFor?.title || "🎯 Target"}
+                            </span>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            {(t.lookingFor?.items || []).map((item: any, i: number) => (
+                                <div key={i} className="flex items-start gap-3">
+                                    <span className="text-brand-cyan mt-0.5 text-xs">✓</span>
+                                    <div className="font-body text-sm leading-snug">
+                                        <strong className="text-foreground font-semibold">{item.label} : </strong>
+                                        <span className="text-muted">{item.value}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
 
-                        {/* "What I'm looking for" card */}
-                        <div style={{
-                            borderRadius: '1rem', padding: '1.5rem',
-                            background: 'var(--note-bg)',
-                            border: '1px solid var(--note-border)',
-                        }}>
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '0.6rem',
-                                marginBottom: '0.85rem',
-                            }}>
-                                <span style={{ fontSize: '1.1rem' }}>🎯</span>
-                                <span style={{
-                                    color: 'var(--color-brand-cyan)', fontWeight: 700, fontSize: '0.9rem',
-                                    fontFamily: 'Outfit, sans-serif', textTransform: 'uppercase', letterSpacing: '0.08em',
-                                }}>
-                                    {t.lookingFor.title}
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                                {t.lookingFor.items.map((item: any, i: number) => (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
-                                        <span style={{ color: 'var(--color-brand-cyan)', marginTop: '0.1rem' }}>✓</span>
-                                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: '0.95rem' }}>
-                                            <strong style={{ color: 'var(--color-foreground)' }}>{item.label} : </strong>
-                                            <span style={{ color: 'var(--text-muted)' }}>{item.value}</span>
+                    {/* 5. Languages Card */}
+                    <motion.div variants={fadeUp} className="glass-card p-6 md:col-span-3">
+                        <h4 className="font-heading font-bold text-sm text-muted uppercase tracking-wider mb-4">
+                            {t.languagesTitle || 'Languages'}
+                        </h4>
+                        <div className="flex flex-wrap gap-4">
+                            {(t.langs || []).map((l: any, i: number) => (
+                                <Magnetic key={i} strength={0.3}>
+                                    <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-surface-hover border border-border/50 hover:border-brand-cyan/30 transition-colors">
+                                        <span className="text-lg">{l.flag}</span>
+                                        <div className="flex flex-col">
+                                            <span className="text-foreground text-xs font-bold font-body">{l.lang}</span>
+                                            <span className="text-muted text-[0.65rem] font-medium font-body uppercase tracking-wider">{l.level}</span>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Languages */}
-                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                            {t.langs.map((l: any) => (
-                                <div key={l.lang} style={{
-                                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                    padding: '0.4rem 0.85rem', borderRadius: '0.5rem',
-                                    background: 'var(--glass-bg)', border: '1px solid var(--border)',
-                                }}>
-                                    <span>{l.flag}</span>
-                                    <span style={{ color: 'var(--color-foreground)', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>{l.lang}</span>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontFamily: 'Inter, sans-serif' }}>— {l.level}</span>
-                                </div>
+                                </Magnetic>
                             ))}
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </div>
-
-            <style>{`
-        @media (max-width: 768px) {
-          div {
-            --about-cols: 1fr !important;
-          }
-        }
-      `}</style>
-        </div>
+        </section>
     );
 }

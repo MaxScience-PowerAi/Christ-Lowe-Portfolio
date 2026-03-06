@@ -1,260 +1,153 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ParticleNetwork } from '../3d/ParticleNetwork';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { Badge } from '../ui/Badge';
+import { Github, Linkedin, Mail, MessageCircle } from 'lucide-react';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    size: Math.random() * 3 + 1,
-    delay: Math.random() * 5,
-    duration: Math.random() * 4 + 4,
-    color: i % 3 === 0 ? 'var(--color-brand-cyan)' : i % 3 === 1 ? 'var(--color-brand-blue)' : 'var(--color-brand-violet)',
-}));
 
 export function HeroSection({ t }: { t: any }) {
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        const t = setTimeout(() => setVisible(true), 100);
-        return () => clearTimeout(t);
-    }, []);
-
     const scrollToProjects = () => {
         document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
-        <div style={{
-            position: 'relative', minHeight: '100vh',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden', padding: '7rem 1.5rem 5rem',
-        }}>
-            {/* Background blobs */}
-            <div style={{
-                position: 'absolute', inset: 0,
-                background: 'radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.18) 0%, transparent 70%)',
-                pointerEvents: 'none',
-            }} />
-            <div style={{
-                position: 'absolute', top: '30%', right: '-10%',
-                width: 500, height: 500, borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 70%)',
-                filter: 'blur(40px)', pointerEvents: 'none',
-            }} />
-            <div style={{
-                position: 'absolute', bottom: '10%', left: '-5%',
-                width: 400, height: 400, borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)',
-                filter: 'blur(40px)', pointerEvents: 'none',
-            }} />
+        <section id="home" className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-28 pb-20">
+            {/* 3D Background (behind everything) */}
+            <ParticleNetwork />
 
-            {/* Floating particles */}
-            {PARTICLES.map(p => (
-                <div
-                    key={p.id}
-                    style={{
-                        position: 'absolute',
-                        left: `${p.left}%`, top: `${p.top}%`,
-                        width: p.size, height: p.size,
-                        borderRadius: '50%',
-                        background: p.color,
-                        opacity: 0.4,
-                        animation: `particle ${p.duration}s ${p.delay}s ease-in-out infinite alternate`,
-                        pointerEvents: 'none',
-                    }}
-                />
-            ))}
+            {/* Subtle Gradient Overlays for depth */}
+            <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background pointer-events-none z-0" />
+            <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+            <div className="absolute -bottom-1/4 -left-1/4 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none z-0" />
 
             {/* Grid overlay */}
-            <div style={{
-                position: 'absolute', inset: 0, pointerEvents: 'none',
+            <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-10" style={{
                 backgroundImage: `
-          linear-gradient(var(--border) 1px, transparent 1px),
-          linear-gradient(90deg, var(--border) 1px, transparent 1px)
-        `,
-                backgroundSize: '60px 60px',
+                  linear-gradient(var(--border) 1px, transparent 1px),
+                  linear-gradient(90deg, var(--border) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 40px',
             }} />
 
-            {/* Content */}
-            <div style={{
-                position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: 860,
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.9s ease, transform 0.9s ease',
-            }}>
-                {/* Badge */}
-                <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                    padding: '0.4rem 1.1rem', borderRadius: 9999,
-                    background: 'var(--tag-bg)',
-                    border: '1px solid var(--tag-border)',
-                    marginBottom: '1.5rem',
-                }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-brand-cyan)', display: 'inline-block', boxShadow: '0 0 8px var(--color-brand-cyan)', animation: 'pulse 2s infinite' }} />
-                    <span style={{ color: 'var(--color-brand-cyan)', fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
-                        {t.badge}
-                    </span>
-                </div>
+            {/* Content Container */}
+            <div className="container-xl relative z-10 text-center max-w-4xl px-4 flex flex-col items-center">
 
-                {/* Name */}
-                <h1 style={{
-                    fontFamily: 'Outfit, sans-serif',
-                    fontWeight: 900,
-                    fontSize: 'clamp(2.2rem, 6.5vw, 5rem)',
-                    lineHeight: 1.05,
-                    margin: '0 0 0.5rem',
-                    letterSpacing: '-0.02em',
-                }}>
-                    {t.greeting}{' '}
-                    <span style={{
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        Christ Lowe
-                    </span>
-                </h1>
-                {/* Full legal name subtitle */}
-                <p style={{
-                    fontFamily: 'Outfit, sans-serif', fontWeight: 600,
-                    fontSize: 'clamp(0.8rem, 2vw, 1rem)',
-                    color: 'var(--text-muted)', letterSpacing: '0.15em', textTransform: 'uppercase',
-                    margin: '0 0 1.1rem',
-                }}>
-                    LINZE LOWE CHRIST MAXIME
-                </p>
-                {/* Animated title tags */}
-                <div style={{
-                    display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
-                    justifyContent: 'center', marginBottom: '1.5rem',
-                }}>
-                    {(t.tags || []).map((tag: string, i: number) => (
-                        <span key={tag} style={{
-                            padding: '0.3rem 0.9rem', borderRadius: 9999,
-                            fontSize: '0.8rem', fontWeight: 600,
-                            fontFamily: 'Inter, sans-serif',
-                            background: i % 2 === 0 ? 'var(--pill-bg)' : 'var(--tag-bg)',
-                            border: `1px solid ${i % 2 === 0 ? 'var(--pill-border)' : 'var(--tag-border)'}`,
-                            color: i % 2 === 0 ? 'var(--pill-text)' : 'var(--tag-text)',
-                        }}>
-                            {tag}
-                        </span>
-                    ))}
-                </div>
+                <motion.div
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                    className="flex flex-col items-center w-full"
+                >
+                    {/* Badge */}
+                    <motion.div variants={fadeUp} className="mb-8">
+                        <Badge variant="cyan" className="px-4 py-1.5 gap-2 border-cyan-500/30 bg-cyan-500/10 rounded-full font-body">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                            </span>
+                            <span className="tracking-widest uppercase text-[0.75rem] font-bold">{t.badge}</span>
+                        </Badge>
+                    </motion.div>
 
-                {/* Hero text */}
-                <h2 style={{
-                    color: 'var(--color-foreground)', fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
-                    fontFamily: 'Inter, sans-serif', fontWeight: 600, margin: '0 0 1rem',
-                }}>
-                    {t.role}
-                </h2>
-                <p style={{
-                    color: 'var(--text-muted)', fontSize: '1.05rem', lineHeight: 1.7,
-                    fontFamily: 'Inter, sans-serif', maxWidth: 640, margin: '0 auto 2.5rem',
-                }}>
-                    {t.sub}
-                </p>
+                    <motion.div variants={fadeUp} className="mb-4">
+                        <h1 className="font-heading font-black text-5xl sm:text-6xl md:text-[5.5rem] leading-[1.05] tracking-tight text-foreground flex flex-wrap justify-center items-end gap-x-4">
+                            <SplitText text={t.greeting_base} className="" delay={0.8} />
+                            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 text-transparent bg-clip-text animate-shimmer bg-[length:200%_auto] pb-1">
+                                <SplitText text="Christ Lowe" className="" delay={1.2} />
+                            </span>
+                        </h1>
+                    </motion.div>
 
-                {/* Sub-subtitle */}
-                <p style={{
-                    color: 'var(--text-muted)',
-                    fontSize: '0.95rem',
-                    marginBottom: '2.5rem',
-                    fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
-                }}>
-                    {t.internship}
-                </p>
+                    {/* Full Name Subtitle */}
+                    <motion.p variants={fadeUp} className="font-heading font-bold text-xs sm:text-sm tracking-[0.2em] text-muted uppercase mb-8">
+                        LINZE LOWE CHRIST MAXIME
+                    </motion.p>
 
-                {/* CTA Buttons */}
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-                    <button onClick={scrollToProjects} className="btn-primary" style={{ padding: '0.9rem 2.2rem', fontSize: '1.05rem' }}>
-                        {t.cta1} &nbsp; <span>↓</span>
-                    </button>
-                    <a href="#contact"
-                        onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
-                        style={{
-                            padding: '0.9rem 2.2rem', borderRadius: 9999,
-                            background: 'var(--glass-bg)', border: '1px solid var(--border)',
-                            color: 'var(--color-foreground)', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: '1.05rem',
-                            display: 'flex', alignItems: 'center', transition: 'all 0.3s',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                        }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--text-muted)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)' }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)' }}
-                    >
-                        {t.cta2}
-                    </a>
-                </div>
+                    {/* Tags */}
+                    <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-3 mb-8">
+                        {(t.tags || []).map((tag: string, i: number) => (
+                            <span key={tag} className="px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold font-body bg-white/5 border border-white/10 text-muted backdrop-blur-sm">
+                                {tag}
+                            </span>
+                        ))}
+                    </motion.div>
 
-                {/* Social quick links */}
-                <div style={{ marginTop: '2.5rem', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    {[
-                        { label: 'GitHub', href: 'https://github.com/MaxScience-PowerAi', icon: '🐙' },
-                        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/', icon: '💼' },
-                        { label: 'Email', href: 'mailto:christlowe6@gmail.com', icon: '✉️' },
-                        { label: 'WhatsApp', href: 'https://wa.me/237678831868', icon: '📱' },
-                    ].map(s => (
-                        <a
-                            key={s.label}
-                            href={s.href}
-                            target={s.href.startsWith('http') ? '_blank' : undefined}
-                            rel="noopener noreferrer"
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '0.4rem',
-                                padding: '0.45rem 1rem', borderRadius: 9999,
-                                background: 'var(--social-bg)',
-                                border: '1px solid var(--social-border)',
-                                color: 'var(--social-text)', textDecoration: 'none',
-                                fontSize: '0.82rem', fontWeight: 600,
-                                transition: 'all 0.2s',
-                                fontFamily: 'Inter, sans-serif',
-                            }}
-                            onMouseEnter={e => {
-                                (e.currentTarget as HTMLElement).style.background = 'var(--social-hover-bg)';
-                                (e.currentTarget as HTMLElement).style.borderColor = 'var(--social-hover-border)';
-                                (e.currentTarget as HTMLElement).style.color = 'var(--social-hover-text)';
-                            }}
-                            onMouseLeave={e => {
-                                (e.currentTarget as HTMLElement).style.background = 'var(--social-bg)';
-                                (e.currentTarget as HTMLElement).style.borderColor = 'var(--social-border)';
-                                (e.currentTarget as HTMLElement).style.color = 'var(--social-text)';
-                            }}
-                        >
-                            <span>{s.icon}</span>
-                            <span>{s.label}</span>
-                        </a>
-                    ))}
-                </div>
-
-                {/* Scroll indicator */}
-                <div style={{
-                    marginTop: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                    color: 'var(--text-muted)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase',
-                    fontFamily: 'Inter, sans-serif',
-                }}>
-                    <span>{t.scroll}</span>
-                    <div style={{
-                        width: 24, height: 38, border: '2px solid var(--border)',
-                        borderRadius: 12, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '0.3rem',
-                    }}>
-                        <div style={{
-                            width: 3, height: 8, background: 'linear-gradient(180deg, var(--color-brand-cyan), var(--color-brand-blue))',
-                            borderRadius: 9999,
-                            animation: 'float 2s ease-in-out infinite',
-                        }} />
+                    {/* Role & Sub */}
+                    <div className="mb-4">
+                        <h2 className="font-body text-xl sm:text-2xl font-medium text-foreground">
+                            <SplitText text={t.role} delay={1.6} />
+                        </h2>
                     </div>
-                </div>
-            </div>
 
-            <style>{`
-        @keyframes particle {
-          from { transform: translateY(0) scale(1); opacity: 0.4; }
-          to   { transform: translateY(-30px) scale(0.6); opacity: 0; }
-        }
-        @keyframes pulse {
-          0%, 100% { box-shadow: 0 0 6px var(--color-brand-cyan); }
-          50% { box-shadow: 0 0 16px var(--color-brand-cyan), 0 0 30px var(--tag-bg); }
-        }
-      `}</style>
-        </div>
+                    <motion.p variants={fadeUp} className="font-body text-base sm:text-lg text-muted max-w-2xl leading-relaxed mb-6">
+                        {t.sub}
+                    </motion.p>
+
+                    <motion.p variants={fadeUp} className="font-body text-sm sm:text-base text-cyan-500/80 italic max-w-xl mb-10">
+                        <SplitText text={`"${t.internship}"`} delay={2} />
+                    </motion.p>
+
+                    {/* Call to Actions */}
+                    <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center gap-6 w-full justify-center lg:w-auto mt-4">
+                        <Magnetic strength={0.4}>
+                            <button onClick={scrollToProjects} className="btn-primary w-full sm:w-auto font-body text-base py-3.5 px-8">
+                                {t.cta1} <span className="ml-2">↓</span>
+                            </button>
+                        </Magnetic>
+                        <Magnetic strength={0.4}>
+                            <a
+                                href="#contact"
+                                onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
+                                className="btn-secondary w-full sm:w-auto font-body text-base py-3.5 px-8"
+                            >
+                                {t.cta2}
+                            </a>
+                        </Magnetic>
+                    </motion.div>
+
+                    {/* Social links */}
+                    <motion.div variants={fadeUp} className="mt-12 flex flex-wrap justify-center gap-6 hidden sm:flex">
+                        {[
+                            { icon: <Github size={18} />, href: 'https://github.com/MaxScience-PowerAi', label: 'GitHub' },
+                            { icon: <Linkedin size={18} />, href: 'https://www.linkedin.com/in/christ-lowe-10a210389/', label: 'LinkedIn' },
+                            { icon: <Mail size={18} />, href: 'mailto:christlowe6@gmail.com', label: 'Email' },
+                            { icon: <MessageCircle size={18} />, href: 'https://wa.me/237678831868', label: 'WhatsApp' },
+                        ].map((s, i) => (
+                            <Magnetic key={i} strength={0.5}>
+                                <a
+                                    href={s.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-hover/50 text-muted hover:text-cyan-400 hover:bg-cyan-500/10 border border-transparent hover:border-cyan-500/20 transition-all text-sm font-medium"
+                                >
+                                    {s.icon} <span className="hidden md:inline">{s.label}</span>
+                                </a>
+                            </Magnetic>
+                        ))}
+                    </motion.div>
+                </motion.div>
+
+                {/* Mouse Scroll Indicator */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.5, duration: 1 }}
+                    className="absolute bottom-6 flex flex-col items-center gap-2 text-muted uppercase text-[0.65rem] tracking-[0.2em] font-body"
+                >
+                    <span>{t.scroll}</span>
+                    <div className="w-[22px] h-[36px] border border-muted/40 rounded-full flex justify-center p-1">
+                        <motion.div
+                            animate={{ y: [0, 12, 0] }}
+                            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                            className="w-1 h-2 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full"
+                        />
+                    </div>
+                </motion.div>
+            </div>
+        </section>
     );
 }
+

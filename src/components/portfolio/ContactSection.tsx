@@ -1,4 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer, slideInLeft, slideInRight } from '../../utils/animations';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
+
 
 interface ContactT {
     tag: string; title: string; heading: string; sub: string;
@@ -6,19 +11,7 @@ interface ContactT {
     send: string; sending: string; sent: string;
 }
 
-function useVisible(threshold = 0.1) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
-
 export function ContactSection({ t }: { t: ContactT }) {
-    const { ref, visible } = useVisible();
     const [formState, setFormState] = useState({ name: '', email: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,196 +35,158 @@ export function ContactSection({ t }: { t: ContactT }) {
     };
 
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                background: 'radial-gradient(circle at 100% 0%, rgba(34,211,238,0.05) 0%, transparent 60%)',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
-            <div className="container-xl" style={{ maxWidth: 1000 }}>
-                {/* Section Header */}
-                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-emerald)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase',
-                        fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
-                    </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
-                        margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
-                    </h2>
-                    <div className="section-divider" style={{ background: 'linear-gradient(90deg, var(--color-brand-emerald), var(--color-brand-cyan))', margin: '0.75rem auto 0' }} />
-                </div>
+        <section id="contact" className="section-pad relative overflow-hidden bg-background">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-cyan/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 left-[-10%] w-[400px] h-[400px] bg-brand-emerald/5 rounded-full blur-[80px] pointer-events-none" />
 
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'var(--contact-cols, 1fr 1.3fr)',
-                    gap: '3rem',
-                }}>
+            <div className="container-xl max-w-5xl mx-auto px-4 relative z-10">
+                {/* Section Header */}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-16"
+                >
+                    <span className="text-brand-emerald font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
+                    </span>
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
+                    </h2>
+                    <div className="w-24 h-1 bg-gradient-to-r from-brand-emerald to-brand-cyan mx-auto mt-6 rounded-full" />
+                </motion.div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-12 lg:gap-16">
                     {/* Left - Contact Info */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-50px" }}
+                        variants={slideInLeft}
+                        className="flex flex-col gap-10"
+                    >
                         <div>
-                            <h3 style={{
-                                fontFamily: 'Outfit, sans-serif', fontSize: '1.4rem', fontWeight: 700,
-                                color: 'var(--color-foreground)', margin: '0 0 1rem',
-                            }}>
+                            <h3 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4">
                                 {t.heading}
                             </h3>
-                            <p style={{
-                                color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.7,
-                                fontFamily: 'Inter, sans-serif', margin: 0,
-                            }}>
+                            <p className="text-muted text-base leading-relaxed font-body">
                                 {t.sub}
                             </p>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <motion.div
+                            variants={staggerContainer}
+                            className="flex flex-col gap-4"
+                        >
                             {[
                                 { icon: '✉️', label: 'Email', value: 'christlowe6@gmail.com', href: 'mailto:christlowe6@gmail.com' },
                                 { icon: '📱', label: 'WhatsApp', value: '+237 678831868', href: 'https://wa.me/237678831868' },
                                 { icon: '💼', label: 'LinkedIn', value: 'Christ Lowe', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/' },
                                 { icon: '📍', label: 'Location', value: 'Douala, Cameroon', href: null },
-                            ].map(item => (
-                                <a
-                                    key={item.label}
-                                    href={item.href || '#'}
-                                    target={item.href?.startsWith('http') ? '_blank' : undefined}
-                                    rel="noopener noreferrer"
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: '1rem',
-                                        padding: '1rem', borderRadius: '1rem',
-                                        background: 'var(--card-bg)',
-                                        border: '1px solid var(--border)',
-                                        textDecoration: 'none', transition: 'all 0.2s',
-                                        pointerEvents: item.href ? 'auto' : 'none',
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (item.href) {
-                                            (e.currentTarget as HTMLElement).style.background = 'var(--surface-hover)';
-                                            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-strong)';
-                                            (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-                                        }
-                                    }}
-                                    onMouseLeave={e => {
-                                        if (item.href) {
-                                            (e.currentTarget as HTMLElement).style.background = 'var(--card-bg)';
-                                            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-                                            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                                        }
-                                    }}
-                                >
-                                    <div style={{
-                                        width: 44, height: 44, borderRadius: '0.75rem',
-                                        background: 'var(--glass-bg)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem',
-                                    }}>
-                                        {item.icon}
-                                    </div>
-                                    <div>
-                                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'Inter, sans-serif' }}>
-                                            {item.label}
+                            ].map((item, index) => (
+                                <Magnetic key={item.label} strength={0.3}>
+                                    <motion.a
+                                        variants={fadeUp}
+                                        href={item.href || '#'}
+                                        target={item.href?.startsWith('http') ? '_blank' : undefined}
+                                        rel="noopener noreferrer"
+                                        className={`flex items-center gap-5 p-4 rounded-2xl border transition-all duration-300 group
+                                            ${item.href ? 'hover:bg-surface-hover hover:border-border-strong hover:-translate-y-1 cursor-pointer' : 'pointer-events-none'}`}
+                                        style={{
+                                            backgroundColor: 'var(--card-bg)',
+                                            borderColor: 'var(--border)',
+                                        }}
+                                    >
+                                        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                                            style={{ backgroundColor: 'var(--glass-bg)' }}>
+                                            {item.icon}
                                         </div>
-                                        <div style={{ color: 'var(--color-foreground)', fontSize: '0.95rem', fontWeight: 500, fontFamily: 'Inter, sans-serif' }}>
-                                            {item.value}
+                                        <div>
+                                            <div className="text-muted text-xs font-bold uppercase tracking-wider font-body mb-1">
+                                                {item.label}
+                                            </div>
+                                            <div className="text-foreground text-[0.95rem] font-medium font-body group-hover:text-brand-cyan transition-colors">
+                                                {item.value}
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
+                                    </motion.a>
+                                </Magnetic>
                             ))}
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
                     {/* Right - Form */}
-                    <div className="glass-card" style={{
-                        borderRadius: '1.5rem', padding: '2.5rem',
-                        background: 'var(--card-bg)', border: '1px solid var(--border)'
-                    }}>
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'var(--form-cols, 1fr 1fr)', gap: '1.5rem' }}>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    <label htmlFor="name" style={{ color: 'var(--color-foreground)', fontSize: '0.85rem', fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>{t.name}</label>
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-50px" }}
+                        variants={slideInRight}
+                        className="rounded-3xl p-8 md:p-10 relative overflow-hidden group/form"
+                        style={{
+                            backgroundColor: 'var(--card-bg)',
+                            borderColor: 'var(--border)',
+                            borderWidth: '1px',
+                        }}
+                    >
+                        {/* Hover glow effect for the form container */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-brand-cyan/5 to-transparent opacity-0 group-hover/form:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="name" className="text-foreground text-sm font-semibold font-body ml-1">{t.name}</label>
                                     <input
                                         type="text" id="name" required
                                         value={formState.name} onChange={e => setFormState({ ...formState, name: e.target.value })}
-                                        style={{
-                                            background: 'var(--input-bg)', border: '1px solid var(--border)',
-                                            borderRadius: '0.75rem', padding: '0.8rem 1rem', color: 'var(--color-foreground)',
-                                            fontFamily: 'Inter, sans-serif', fontSize: '0.95rem',
-                                            outline: 'none', transition: 'border-color 0.2s',
-                                        }}
-                                        onFocus={e => e.currentTarget.style.borderColor = 'var(--color-brand-cyan)'}
-                                        onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                                        className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground font-body outline-none transition-all duration-300 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/50 focus:bg-surface-hover hover:border-border-strong"
+                                        placeholder="John Doe"
                                     />
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    <label htmlFor="email" style={{ color: 'var(--color-foreground)', fontSize: '0.85rem', fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>{t.email}</label>
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="email" className="text-foreground text-sm font-semibold font-body ml-1">{t.email}</label>
                                     <input
                                         type="email" id="email" required
                                         value={formState.email} onChange={e => setFormState({ ...formState, email: e.target.value })}
-                                        style={{
-                                            background: 'var(--input-bg)', border: '1px solid var(--border)',
-                                            borderRadius: '0.75rem', padding: '0.8rem 1rem', color: 'var(--color-foreground)',
-                                            fontFamily: 'Inter, sans-serif', fontSize: '0.95rem',
-                                            outline: 'none', transition: 'border-color 0.2s',
-                                        }}
-                                        onFocus={e => e.currentTarget.style.borderColor = 'var(--color-brand-cyan)'}
-                                        onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                                        className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground font-body outline-none transition-all duration-300 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/50 focus:bg-surface-hover hover:border-border-strong"
+                                        placeholder="john@example.com"
                                     />
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label htmlFor="message" style={{ color: 'var(--color-foreground)', fontSize: '0.85rem', fontWeight: 600, fontFamily: 'Inter, sans-serif' }}>{t.message}</label>
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="message" className="text-foreground text-sm font-semibold font-body ml-1">{t.message}</label>
                                 <textarea
                                     id="message" required rows={5}
                                     value={formState.message} onChange={e => setFormState({ ...formState, message: e.target.value })}
-                                    style={{
-                                        background: 'var(--input-bg)', border: '1px solid var(--border)',
-                                        borderRadius: '0.75rem', padding: '0.8rem 1rem', color: 'var(--color-foreground)',
-                                        fontFamily: 'Inter, sans-serif', fontSize: '0.95rem',
-                                        outline: 'none', transition: 'border-color 0.2s', resize: 'vertical',
-                                    }}
-                                    onFocus={e => e.currentTarget.style.borderColor = 'var(--color-brand-cyan)'}
-                                    onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                                    className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground font-body outline-none transition-all duration-300 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/50 focus:bg-surface-hover hover:border-border-strong resize-y"
+                                    placeholder="How can I help you?"
                                 />
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="btn-primary"
-                                style={{
-                                    width: '100%', justifyContent: 'center', padding: '0.9rem', fontSize: '1rem',
-                                    opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'wait' : 'pointer',
-                                    marginTop: '0.5rem',
-                                }}
-                            >
-                                {isSubmitting ? t.sending : t.send}
-                            </button>
+                            <Magnetic strength={0.4} className="w-full">
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="btn-primary w-full justify-center py-4 text-base mt-2 relative overflow-hidden group/btn"
+                                >
+                                    <span className={`transition-opacity duration-300 ${isSubmitting ? 'opacity-0' : 'opacity-100'} flex items-center justify-center gap-2`}>
+                                        {t.send}
+                                        <span className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform duration-300">↗</span>
+                                    </span>
+                                    {isSubmitting && (
+                                        <span className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            <span className="ml-3">{t.sending}</span>
+                                        </span>
+                                    )}
+                                </button>
+                            </Magnetic>
                         </form>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-
-            <style>{`
-        @media (max-width: 768px) {
-          div {
-            --contact-cols: 1fr !important;
-            --form-cols: 1fr !important;
-          }
-        }
-      `}</style>
-        </div>
+        </section>
     );
 }

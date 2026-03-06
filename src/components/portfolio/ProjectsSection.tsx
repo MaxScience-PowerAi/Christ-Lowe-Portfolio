@@ -1,177 +1,150 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { Github, ExternalLink, BookOpen } from 'lucide-react';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-function useVisible(threshold = 0.1) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
-
-// Add structure pattern if needed, but data now comes from t.items
 
 export function ProjectsSection({ t }: { t: any }) {
-    const { ref, visible } = useVisible();
-    const [hovered, setHovered] = useState<number | null>(null);
-
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
-            {/* Glow bg */}
-            <div style={{
-                position: 'absolute', top: '20%', right: '-15%',
-                width: '60%', height: '60%',
-                background: 'radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 70%)',
-                filter: 'blur(60px)', pointerEvents: 'none',
-            }} />
+        <section id="projects" className="section-pad relative overflow-hidden bg-surface">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-[20%] right-[-15%] w-[60%] h-[60%] bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute bottom-[10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="container-xl">
+            <div className="container-xl relative z-10 max-w-5xl mx-auto px-4">
                 {/* Section Header */}
-                <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-cyan)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase',
-                        fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-20"
+                >
+                    <span className="text-cyan-500 font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
                     </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
-                        margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
                     </h2>
-                    <div className="section-divider" style={{ background: 'linear-gradient(90deg, var(--color-brand-cyan), var(--color-brand-blue))', margin: '0.75rem auto 0' }} />
-                </div>
+                    <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto mt-6 rounded-full" />
+                </motion.div>
 
                 {/* Project Cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: 900, margin: '0 auto' }}>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={staggerContainer}
+                    className="flex flex-col gap-10"
+                >
                     {t.items.map((project: any, i: number) => (
-                        <div
+                        <motion.div
                             key={project.id || i}
-                            onMouseEnter={() => setHovered(project.id || i)}
-                            onMouseLeave={() => setHovered(null)}
-                            style={{
-                                display: 'flex', flexDirection: 'column',
-                                background: 'var(--card-bg)', borderRadius: '1.25rem',
-                                border: `1px solid ${hovered === (project.id || i) ? project.borderColor || 'var(--color-brand-cyan)' : 'var(--border)'}`,
-                                overflow: 'hidden', transition: 'all 0.3s ease',
-                                transform: hovered === (project.id || i) ? 'translateY(-4px)' : 'translateY(0)',
-                                boxShadow: hovered === (project.id || i) ? `0 12px 40px rgba(34,211,238,0.08)` : '0 4px 20px rgba(0,0,0,0.02)',
-                            }}
+                            variants={fadeUp}
+                            whileHover={{ y: -5 }}
+                            className="group relative flex flex-col bg-background rounded-3xl border border-border overflow-hidden transition-all duration-500 hover:border-cyan-500/30 hover:shadow-[0_20px_40px_-15px_rgba(6,182,212,0.15)]"
                         >
                             {/* Top gradient bar */}
-                            <div style={{ height: 4, background: 'linear-gradient(90deg, var(--color-brand-cyan), var(--color-brand-blue), var(--color-brand-violet))' }} />
+                            <div className="h-1.5 w-full bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 opacity-80 group-hover:opacity-100 transition-opacity" />
 
-                            <div style={{ padding: '2rem 2.25rem' }}>
-                                {/* Tag + icon */}
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                    <span className="project-tag">{project.tag}</span>
-                                    <div style={{
-                                        width: 52, height: 52, borderRadius: '1rem',
-                                        background: 'var(--glass-bg)',
-                                        border: '1px solid var(--glass-border)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '1.6rem',
-                                    }}>
+                            {/* Card Content Overlay Glow */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                            <div className="p-8 md:p-10 relative z-10">
+                                {/* Header: Tag & Icon */}
+                                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                                    <span className="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold font-heading uppercase tracking-widest backdrop-blur-sm">
+                                        {project.tag}
+                                    </span>
+                                    <div className="w-14 h-14 rounded-2xl bg-surface-hover border border-border flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 group-hover:bg-cyan-500/5 transition-all duration-300">
                                         {project.icon}
                                     </div>
                                 </div>
 
-                                {/* Title */}
-                                <h3 style={{
-                                    fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                                    fontSize: 'clamp(1.2rem, 3vw, 1.6rem)',
-                                    color: 'var(--color-foreground)', margin: '0 0 1rem',
-                                    lineHeight: 1.3,
-                                }}>
-                                    {project.title}
+                                {/* Title & Description */}
+                                <h3 className="font-heading font-extrabold text-2xl md:text-3xl text-foreground mb-4 leading-tight group-hover:text-cyan-400 transition-colors">
+                                    <SplitText text={project.title} delay={0.2} />
                                 </h3>
 
-                                {/* Description */}
-                                <p style={{
-                                    color: 'var(--text-muted)', fontSize: '0.97rem', lineHeight: 1.8,
-                                    fontFamily: 'Inter, sans-serif', margin: '0 0 1rem',
-                                }}>
+                                <p className="text-muted text-base md:text-[1.05rem] leading-relaxed font-body mb-6 max-w-3xl">
                                     {project.description}
                                 </p>
 
                                 {/* Insight blockquote */}
-                                <blockquote style={{
-                                    borderLeft: `3px solid ${project.tagColor}`,
-                                    paddingLeft: '1rem', margin: '0 0 1.5rem',
-                                    color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.75,
-                                    fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
-                                }}>
-                                    {project.insight}
-                                </blockquote>
+                                {project.insight && (
+                                    <blockquote className="border-l-4 pl-5 py-1 my-8 text-muted/90 text-[0.95rem] leading-relaxed font-body italic" style={{ borderLeftColor: project.tagColor || 'var(--color-brand-cyan)' }}>
+                                        {project.insight}
+                                    </blockquote>
+                                )}
 
                                 {/* Tech stack */}
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.75rem' }}>
-                                    {project.tech.map(t => (
-                                        <span key={t} className="skill-pill">{t}</span>
+                                <div className="flex flex-wrap gap-2.5 mb-10">
+                                    {project.tech.map((t: string) => (
+                                        <span key={t} className="px-3 py-1.5 bg-surface rounded-lg border border-border/50 text-foreground text-xs font-semibold font-body">
+                                            {t}
+                                        </span>
                                     ))}
                                 </div>
 
-                                {/* Buttons */}
-                                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                                    <a
-                                        href={project.githubUrl}
-                                        target="_blank" rel="noopener noreferrer"
-                                        className="btn-primary"
-                                        style={{ padding: '0.6rem 1.4rem', fontSize: '0.85rem' }}
-                                    >
-                                        <span>🐙</span>
-                                        <span>{t.viewCode || 'View code on GitHub'}</span>
-                                    </a>
-                                    {project.colabUrl && (
+                                {/* Action Buttons */}
+                                <div className="flex flex-wrap gap-4">
+                                    <Magnetic strength={0.3}>
                                         <a
-                                            href={project.colabUrl}
+                                            href={project.githubUrl}
                                             target="_blank" rel="noopener noreferrer"
-                                            className="btn-secondary"
-                                            style={{ padding: '0.6rem 1.4rem', fontSize: '0.85rem' }}
+                                            className="btn-primary py-2.5 px-6 gap-2 text-sm"
                                         >
-                                            <span>📓</span>
-                                            <span>{t.viewNotebook || 'View notebook'}</span>
+                                            <Github size={16} />
+                                            <span>{t.viewCode || 'Code Source'}</span>
                                         </a>
+                                    </Magnetic>
+                                    {project.colabUrl && (
+                                        <Magnetic strength={0.3}>
+                                            <a
+                                                href={project.colabUrl}
+                                                target="_blank" rel="noopener noreferrer"
+                                                className="btn-secondary py-2.5 px-6 gap-2 text-sm bg-surface-hover"
+                                            >
+                                                <BookOpen size={16} />
+                                                <span>{t.viewNotebook || 'Notebook'}</span>
+                                            </a>
+                                        </Magnetic>
+                                    )}
+                                    {project.demoUrl && (
+                                        <Magnetic strength={0.3}>
+                                            <a
+                                                href={project.demoUrl}
+                                                target="_blank" rel="noopener noreferrer"
+                                                className="btn-secondary py-2.5 px-6 gap-2 text-sm bg-surface-hover hover:border-cyan-500/50"
+                                            >
+                                                <ExternalLink size={16} />
+                                                <span>{t.liveDemo || 'Live Demo'}</span>
+                                            </a>
+                                        </Magnetic>
                                     )}
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Bottom note */}
-                <div style={{
-                    textAlign: 'center', marginTop: '3rem',
-                    padding: '1.25rem 2rem',
-                    borderRadius: '0.85rem',
-                    background: 'var(--note-bg)',
-                    border: '1px solid var(--note-border)',
-                    maxWidth: 700, margin: '3rem auto 0',
-                }}>
-                    <p style={{
-                        color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0,
-                        fontFamily: 'Inter, sans-serif', lineHeight: 1.7, fontStyle: 'italic',
-                    }}>
-                        📁 {t.note?.replace('📁 ', '') || 'This portfolio shows a selection of my projects.'}
-                    </p>
-                </div>
+                {t.note && (
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        variants={fadeUp}
+                        className="mt-16 text-center p-6 md:p-8 rounded-2xl bg-surface-hover border border-border max-w-2xl mx-auto"
+                    >
+                        <p className="text-muted text-sm md:text-base font-body leading-relaxed max-w-xl mx-auto italic">
+                            📁 {t.note?.replace('📁 ', '') || 'Sélection de projets illustrant mon expertise technique.'}
+                        </p>
+                    </motion.div>
+                )}
             </div>
-        </div>
+        </section>
     );
 }

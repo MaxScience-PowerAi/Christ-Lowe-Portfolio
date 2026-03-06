@@ -8,9 +8,10 @@ export const portfolioTranslations = {
             lightMode: 'Mode clair', darkMode: 'Mode sombre',
         },
         hero: {
-            greeting: 'Salut, je suis',
-            role: 'Étudiant en Mathématiques & Ingénieur IA en devenir',
-            sub: 'Co-fondateur de PowerAi · Douala, Cameroun',
+            greeting_base: 'Salut, Je suis',
+            greeting_full: 'Salut, Je suis Christ Lowe',
+            role: 'Etudiant en Mathematiques et Ingenieur IA en devenir',
+            sub: 'Co-fondateur de PowerAi - Douala, Cameroun',
             cta1: 'Voir mes projets',
             cta2: 'Me contacter',
             badge: 'Disponible pour un stage',
@@ -19,39 +20,41 @@ export const portfolioTranslations = {
             scroll: 'Défiler pour explorer',
         },
         about: {
-            tag: '01 · À propos',
+            tag: '01 - A propos',
             title: 'Qui suis-je ?',
-            intro: `Je suis LINZE LOWE CHRIST MAXIME, étudiant en Mathématiques (L3) à Douala, Cameroun. Passionné par l'Intelligence Artificielle, la Data Science et le développement, je construis des projets concrets pour apprendre et contribuer à l'écosystème technologique africain.`,
-            intro2: `L'un des huit co-fondateurs de PowerAi, une communauté IA basée au Cameroun. Je crois que la technologie peut transformer notre continent — et je veux en faire partie.`,
+            introTitle: 'Qui suis-je ?',
+            languagesTitle: 'Langues',
+            intro: `Je suis LINZE LOWE CHRIST MAXIME, etudiant en Mathematiques (L3) a Douala, Cameroun. Passionne par l'Intelligence Artificielle, la Data Science et le developpement, je construis des projets concrets pour apprendre et contribuer a l'ecosysteme technologique africain.`,
+            intro2: `L'un des huit co-fondateurs de PowerAi, une communaute IA basee au Cameroun. Je crois que la technologie peut transformer notre continent - et je veux en faire partie.`,
             facts: {
                 title: 'En bref',
                 items: [
                     { label: 'Localisation', value: 'Douala, Cameroun' },
-                    { label: 'Formation', value: 'Mathématiques — L3' },
-                    { label: 'Communauté', value: 'PowerAi (co-fondateur)' },
-                    { label: 'Langues', value: 'Français · Anglais' },
-                    { label: 'Disponibilité', value: 'Stage / Période de stage' },
+                    { label: 'Formation', value: 'Mathematiques - L3' },
+                    { label: 'Communaute', value: 'PowerAi (co-fondateur)' },
+                    { label: 'Langues', value: 'Francais - Anglais' },
+                    { label: 'Disponibilite', value: 'Stage' },
                 ]
             },
             lookingFor: {
                 title: 'Ce que je recherche',
                 items: [
                     { label: 'Stages', value: 'Data Science, Machine Learning, IA Engineering' },
-                    { label: 'Freelance / Missions', value: 'Création de sites, automatisation, bots IA' },
-                    { label: 'Réseautage', value: 'Échanger avec des mentors et professionnels de la tech' },
-                    { label: 'Communauté', value: 'Développer l\'écosystème IA en Afrique avec PowerAi' }
+                    { label: 'Freelance', value: 'Creation de sites, automatisation, bots IA' },
+                    { label: 'Reseautage', value: 'Echanger avec des mentors' },
+                    { label: 'Communaute', value: 'Developper l\'ecosysteme IA en Afrique' }
                 ]
             },
             langs: [
-                { flag: '🇬🇧', lang: 'Anglais', level: 'Courant' },
-                { flag: '🇫🇷', lang: 'Français', level: 'Courant' },
+                { flag: 'EN', lang: 'Anglais', level: 'Courant' },
+                { flag: 'FR', lang: 'Francais', level: 'Courant' },
             ],
-            subtitle: 'Ingénieur IA · Douala 🇨🇲',
+            subtitle: 'Ingénieur IA - Douala',
             quickFacts: [
-                { icon: '🎓', label: 'Mathématiques L3', sub: 'Université de Douala' },
-                { icon: '📍', label: 'Douala, Cameroun', sub: 'Disponible à distance / sur site' },
-                { icon: '🚀', label: 'Co-fondateur', sub: 'Communauté PowerAi' },
-                { icon: '✝️', label: 'Guidé par la foi', sub: 'Dieu est mon moteur' },
+                { icon: '🎓', label: 'Mathematiques L3', sub: 'Universite de Douala' },
+                { icon: '📍', label: 'Douala, Cameroun', sub: 'Disponible' },
+                { icon: '🚀', label: 'Co-fondateur', sub: 'Communaute PowerAi' },
+                { icon: '✝️', label: 'Foi', sub: 'Dieu est mon moteur' },
             ],
         },
         skills: {
@@ -204,7 +207,8 @@ export const portfolioTranslations = {
             lightMode: 'Light mode', darkMode: 'Dark mode',
         },
         hero: {
-            greeting: "Hi, I'm",
+            greeting_base: "Hi, I'm",
+            greeting_full: "Hi, I'm Christ Lowe",
             role: 'Mathematics Student & Aspiring AI Engineer',
             sub: 'Co-founder of PowerAi · Douala, Cameroon',
             cta1: 'View my projects',
@@ -215,17 +219,19 @@ export const portfolioTranslations = {
             scroll: 'Scroll to explore',
         },
         about: {
-            tag: '01 · About',
+            tag: '01 - About',
             title: 'Who am I?',
+            introTitle: 'Who am I?',
+            languagesTitle: 'Languages',
             intro: `I am LINZE LOWE CHRIST MAXIME, a Level 3 (L3) Mathematics student in Douala, Cameroon. Passionate about Artificial Intelligence, Data Science, and development, I build concrete projects to learn and contribute to Africa's tech ecosystem.`,
-            intro2: `One of the eight co-founders of PowerAi, an AI community based in Cameroon. I believe technology can transform our continent — and I want to be part of that change.`,
+            intro2: `One of the eight co-founders of PowerAi, an AI community based in Cameroon. I believe technology can transform our continent - and I want to be part of that change.`,
             facts: {
                 title: 'Quick facts',
                 items: [
                     { label: 'Location', value: 'Douala, Cameroon' },
-                    { label: 'Education', value: 'Mathematics — Year 3 (L3)' },
+                    { label: 'Education', value: 'Mathematics - Year 3 (L3)' },
                     { label: 'Community', value: 'PowerAi (co-founder)' },
-                    { label: 'Languages', value: 'French · English' },
+                    { label: 'Languages', value: 'French - English' },
                     { label: 'Availability', value: 'Internships' },
                 ]
             },
@@ -234,18 +240,18 @@ export const portfolioTranslations = {
                 items: [
                     { label: 'Internships', value: 'Data Science, Machine Learning, AI Engineering' },
                     { label: 'Freelance / Projects', value: 'Websites, automation, AI bots' },
-                    { label: 'Networking', value: 'Connecting with tech professionals and mentors' },
-                    { label: 'Community', value: 'Growing the African AI ecosystem with PowerAi' }
+                    { label: 'Networking', value: 'Connecting with tech professionals' },
+                    { label: 'Community', value: 'Growing the African AI ecosystem' }
                 ]
             },
             langs: [
-                { flag: '🇬🇧', lang: 'English', level: 'Fluent' },
-                { flag: '🇫🇷', lang: 'French', level: 'Fluent' },
+                { flag: 'EN', lang: 'English', level: 'Fluent' },
+                { flag: 'FR', lang: 'French', level: 'Fluent' },
             ],
-            subtitle: 'AI Engineer · Douala 🇨🇲',
+            subtitle: 'AI Engineer - Douala',
             quickFacts: [
                 { icon: '🎓', label: 'Level 3 Mathematics', sub: 'University of Douala' },
-                { icon: '📍', label: 'Douala, Cameroon', sub: 'Available remote / on-site' },
+                { icon: '📍', label: 'Douala, Cameroon', sub: 'Available' },
                 { icon: '🚀', label: 'Co-founder', sub: 'PowerAi Community' },
                 { icon: '✝️', label: 'Faith-driven', sub: 'God is my engine' },
             ],

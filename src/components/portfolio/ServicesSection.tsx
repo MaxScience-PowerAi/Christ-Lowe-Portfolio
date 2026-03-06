@@ -1,18 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-function useVisible(threshold = 0.08) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-            { threshold }
-        );
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
 
 interface ServiceItem {
     icon: string; title: string; audiences: string[];
@@ -45,188 +36,161 @@ const CARD_COLORS = [
 ];
 
 export function ServicesSection({ t }: { t: ServicesT }) {
-    const { ref, visible } = useVisible();
-
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.06) 0%, transparent 70%)',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
-            <div style={{
-                position: 'absolute', top: '50%', left: '-10%',
-                width: 500, height: 500, borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(34,211,238,0.04) 0%, transparent 70%)',
-                filter: 'blur(80px)', pointerEvents: 'none',
-            }} />
+        <section id="services" className="section-pad relative overflow-hidden bg-background">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-[40%] left-[-10%] w-[500px] h-[500px] bg-brand-cyan/5 rounded-full blur-[80px] pointer-events-none" />
 
-            <div className="container-xl" style={{ maxWidth: 1100 }}>
+            <div className="container-xl max-w-6xl mx-auto px-4 relative z-10">
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-violet)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-16"
+                >
+                    <span className="text-brand-violet font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
                     </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
                     </h2>
-                    <div className="section-divider" style={{
-                        background: 'linear-gradient(90deg, var(--color-brand-violet), var(--color-brand-cyan))',
-                        margin: '0.75rem auto 0',
-                    }} />
-                    <p
-                        style={{
-                            color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.7,
-                            fontFamily: 'Inter, sans-serif', maxWidth: 620, margin: '1.5rem auto 0',
-                        }}
-                    >
+                    <div className="w-24 h-1 bg-gradient-to-r from-brand-violet to-brand-cyan mx-auto mt-6 rounded-full" />
+                    <p className="text-muted text-base md:text-lg leading-relaxed font-body max-w-2xl mx-auto mt-8">
                         {t.pitch.split(/<strong>(.*?)<\/strong>/g).map((part: string, i: number) =>
-                            i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
+                            i % 2 === 1 ? <strong key={i} className="text-foreground font-semibold">{part}</strong> : <span key={i}>{part}</span>
                         )}
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Services Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={staggerContainer}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
+                >
                     {t.items.map((service, i) => {
                         const colors = CARD_COLORS[i % CARD_COLORS.length];
-                        return <ServiceCard key={service.title} service={service} colors={colors} index={i} visible={visible} />;
+                        return <ServiceCard key={service.title} service={service} colors={colors} />;
                     })}
-                </div>
+                </motion.div>
 
                 {/* CTA Banner */}
-                <div style={{
-                    marginTop: '3.5rem', padding: '2.5rem', borderRadius: '1.5rem',
-                    background: 'var(--card-bg)', border: '1px solid var(--border)',
-                    display: 'flex', flexWrap: 'wrap', alignItems: 'center',
-                    justifyContent: 'space-between', gap: '1.5rem',
-                    position: 'relative', overflow: 'hidden',
-                }}>
-                    <div style={{
-                        position: 'absolute', right: '-5%', top: '-30%',
-                        width: 300, height: 300, borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 70%)',
-                        filter: 'blur(60px)', pointerEvents: 'none',
-                    }} />
-                    <div style={{ position: 'relative' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                            <span style={{
-                                width: 10, height: 10, borderRadius: '50%',
-                                background: 'var(--color-brand-emerald)', display: 'inline-block',
-                                boxShadow: '0 0 10px var(--color-brand-emerald)',
-                            }} />
-                            <span style={{
-                                color: 'var(--color-brand-emerald)', fontWeight: 700, fontSize: '0.8rem',
-                                fontFamily: 'Outfit, sans-serif', letterSpacing: '0.1em', textTransform: 'uppercase',
-                            }}>
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={fadeUp}
+                    className="mt-16 p-8 md:p-10 rounded-3xl bg-surface border border-border flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group"
+                >
+                    <div className="absolute -right-10 -top-32 w-[400px] h-[400px] bg-brand-cyan/5 rounded-full blur-[60px] pointer-events-none group-hover:bg-brand-cyan/10 transition-colors duration-700" />
+
+                    <div className="relative z-10 max-w-xl">
+                        <div className="flex items-center gap-3 mb-3">
+                            <span className="w-2.5 h-2.5 rounded-full bg-brand-emerald shadow-[0_0_10px_var(--color-brand-emerald)] animate-pulse" />
+                            <span className="text-brand-emerald font-bold text-xs font-heading uppercase tracking-widest">
                                 {t.ctaTag}
                             </span>
                         </div>
-                        <h3 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.3rem', color: 'var(--color-foreground)', margin: 0 }}>
+                        <h3 className="font-heading font-bold text-2xl md:text-3xl text-foreground mb-2">
                             {t.ctaTitle}
                         </h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontFamily: 'Inter, sans-serif', margin: '0.4rem 0 0' }}>
+                        <p className="text-muted text-sm md:text-base font-body leading-relaxed">
                             {t.ctaSub}
                         </p>
                     </div>
-                    <a
-                        href="#contact"
-                        onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
-                        className="btn-primary"
-                        style={{ flexShrink: 0, padding: '0.85rem 2rem', fontSize: '0.95rem' }}
-                    >
-                        <span>✉️</span>
-                        <span>{t.cta}</span>
-                    </a>
-                </div>
+
+                    <Magnetic strength={0.4}>
+                        <a
+                            href="#contact"
+                            onClick={e => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
+                            className="btn-primary shrink-0 relative z-10 py-3 px-8 group/btn"
+                        >
+                            <span className="group-hover/btn:-translate-y-0.5 transition-transform duration-300">✉️</span>
+                            <span>{t.cta}</span>
+                        </a>
+                    </Magnetic>
+                </motion.div>
             </div>
-        </div>
+        </section>
     );
 }
 
-function ServiceCard({ service, colors, index, visible }: {
+function ServiceCard({ service, colors }: {
     service: ServiceItem;
     colors: { color: string; glow: string; border: string };
-    index: number;
-    visible: boolean;
 }) {
-    const [hovered, setHovered] = useState(false);
-
     return (
-        <div
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
+        <motion.div
+            variants={fadeUp}
+            whileHover={{ y: -5 }}
+            className="flex flex-col gap-6 p-8 rounded-3xl relative overflow-hidden transition-all duration-300 group"
             style={{
-                background: hovered ? colors.glow : 'var(--card-bg)',
-                border: `1px solid ${hovered ? colors.border : 'var(--border)'}`,
-                borderRadius: '1.25rem', padding: '1.75rem', cursor: 'default',
-                transition: 'all 0.3s ease',
-                transform: visible ? (hovered ? 'translateY(-4px)' : 'translateY(0)') : 'translateY(30px)',
-                opacity: visible ? 1 : 0,
-                transitionDelay: `${index * 0.07}s`,
-                boxShadow: hovered ? `0 12px 40px ${colors.glow}` : 'none',
-                display: 'flex', flexDirection: 'column', gap: '1rem',
+                backgroundColor: 'var(--card-bg)',
+                borderColor: 'var(--border)',
+                borderWidth: '1px',
             }}
         >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
-                <div style={{
-                    width: 52, height: 52, borderRadius: '1rem', flexShrink: 0,
-                    background: hovered ? colors.glow : 'var(--glass-bg)',
-                    border: `1px solid ${hovered ? colors.border : 'var(--border)'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '1.5rem', transition: 'all 0.3s',
-                }}>
-                    {service.icon}
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'flex-end' }}>
+            <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{ background: `radial-gradient(circle at top right, ${colors.glow}, transparent 70%)` }}
+            />
+
+            <div className="relative z-10 flex items-start justify-between gap-4">
+                <Magnetic strength={0.4}>
+                    <div
+                        className="w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center text-2xl transition-all duration-300"
+                        style={{
+                            backgroundColor: 'var(--glass-bg)',
+                            borderColor: 'var(--border)',
+                            borderWidth: '1px',
+                        }}
+                    >
+                        <span className="group-hover:scale-110 transition-transform duration-300">{service.icon}</span>
+                    </div>
+                </Magnetic>
+
+                <div className="flex flex-wrap gap-2 justify-end">
                     {service.audiences.map(aud => (
-                        <span key={aud} style={{
-                            fontSize: '0.68rem', fontWeight: 700, fontFamily: 'Inter, sans-serif',
-                            padding: '0.2rem 0.6rem', borderRadius: '99px',
-                            background: `${AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)'}15`,
-                            border: `1px solid ${AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)'}30`,
-                            color: AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)',
-                            textTransform: 'uppercase', letterSpacing: '0.05em',
-                        }}>
+                        <span
+                            key={aud}
+                            className="text-[0.68rem] font-bold font-body px-2.5 py-1 rounded-full uppercase tracking-wider border"
+                            style={{
+                                backgroundColor: `${AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)'}15`,
+                                borderColor: `${AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)'}30`,
+                                color: AUDIENCE_COLORS[aud] || 'var(--color-brand-cyan)',
+                            }}
+                        >
                             {aud}
                         </span>
                     ))}
                 </div>
             </div>
-            <h3 style={{
-                fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.1rem',
-                color: hovered ? colors.color : 'var(--color-foreground)',
-                margin: 0, transition: 'color 0.3s',
-            }}>
-                {service.title}
-            </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', lineHeight: 1.65, fontFamily: 'Inter, sans-serif', margin: 0, flex: 1 }}>
-                {service.desc}
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.25rem' }}>
-                {service.tags.map(tag => (
-                    <span key={tag} style={{
-                        fontSize: '0.72rem', fontWeight: 600, fontFamily: 'Inter, sans-serif',
-                        padding: '0.25rem 0.65rem', borderRadius: '0.5rem',
-                        background: 'var(--glass-bg)', border: '1px solid var(--border)', color: 'var(--text-muted)',
-                    }}>
-                        {tag}
-                    </span>
-                ))}
+
+            <div className="relative z-10 flex-1 flex flex-col">
+                <h3
+                    className="font-heading font-bold text-xl mb-3 transition-colors duration-300"
+                    style={{ color: 'var(--color-foreground)' }}
+                >
+                    <SplitText text={service.title} delay={0.2} />
+                </h3>
+                <p className="text-muted text-[0.95rem] leading-relaxed font-body mb-6 flex-1">
+                    {service.desc}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-auto">
+                    {service.tags.map(tag => (
+                        <span
+                            key={tag}
+                            className="text-xs font-semibold font-body px-3 py-1.5 rounded-lg bg-surface border border-border/50 text-muted"
+                        >
+                            {tag}
+                        </span>
+                    ))}
+                </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

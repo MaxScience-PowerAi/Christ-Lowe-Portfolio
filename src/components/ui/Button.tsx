@@ -1,43 +1,44 @@
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../utils/cn'; // Updated path to utils/cn
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'glass' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'glass';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
+  asChild?: boolean; // simple mock for asChild if they wrap something else, but here we just keep normal
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', isLoading, children, ...props }, ref) => {
+
+    // Instead of complex Tailwind strings, we use the custom CSS classes from index.css 
+    // for primary/secondary/glass, and minimal Tailwind for others to keep it clean.
     const variants = {
-      primary: 'bg-cyan-500 hover:bg-cyan-400 text-zinc-950 shadow-lg shadow-cyan-500/20',
-      secondary: 'bg-slate-900 dark:bg-white/10 hover:bg-black dark:hover:bg-white/20 text-white border border-slate-800 dark:border-white/20',
-      glass: 'glass-premium hover:bg-white/60 dark:hover:bg-zinc-800/60 text-slate-900 dark:text-white',
-      outline: 'border border-slate-300 dark:border-zinc-700 hover:border-cyan-500 text-slate-600 dark:text-zinc-400 hover:text-cyan-500 dark:hover:text-cyan-400',
-      ghost: 'hover:bg-slate-100 dark:hover:bg-zinc-800/50 text-slate-600 dark:text-zinc-400',
+      primary: 'btn-primary',
+      secondary: 'btn-secondary',
+      ghost: 'hover:bg-white/5 text-zinc-400 hover:text-white bg-transparent border-transparent transition-colors',
+      glass: 'glass-card hover:bg-white/5 text-white',
     };
 
     const sizes = {
-      sm: 'px-3 py-1.5 text-xs',
+      sm: 'px-4 py-2 text-xs',
       md: 'px-6 py-3 text-sm',
       lg: 'px-8 py-4 text-base',
-      xl: 'px-10 py-5 text-lg',
     };
 
     return (
       <button
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center rounded-2xl font-bold uppercase tracking-widest transition-all disabled:opacity-50 disabled:pointer-events-none hover:scale-[1.02] active:scale-[0.98]',
+          'inline-flex items-center justify-center rounded-full font-heading font-semibold transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none',
           variants[variant],
           sizes[size],
           className
         )}
-        style={{ transition: 'transform 0.15s ease, background-color 0.2s ease, opacity 0.2s ease' }}
         {...props}
       >
         {isLoading ? (
-          <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
         ) : null}
         {children}
       </button>
@@ -46,3 +47,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = 'Button';
+

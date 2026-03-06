@@ -1,18 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { fadeUp, staggerContainer } from '../../utils/animations';
+import { SplitText } from '../ui/SplitText';
+import { Magnetic } from '../ui/Magnetic';
 
-function useVisible(threshold = 0.08) {
-    const ref = useRef<HTMLDivElement>(null);
-    const [visible, setVisible] = useState(false);
-    useEffect(() => {
-        const obs = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-            { threshold }
-        );
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-    }, []);
-    return { ref, visible };
-}
 
 interface JourneyT {
     tag: string; title: string; intro: string;
@@ -24,162 +15,168 @@ interface JourneyT {
 }
 
 export function JourneySection({ t }: { t: JourneyT }) {
-    const { ref, visible } = useVisible();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start center", "end center"],
+    });
+
+    const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
     return (
-        <div
-            ref={ref}
-            className="section-pad"
-            style={{
-                position: 'relative', overflow: 'hidden',
-                background: 'radial-gradient(ellipse 70% 60% at 50% 100%, rgba(99,102,241,0.05) 0%, transparent 70%)',
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(40px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-            }}
-        >
-            <div style={{
-                position: 'absolute', bottom: '-10%', right: '-8%',
-                width: 500, height: 500, borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)',
-                filter: 'blur(80px)', pointerEvents: 'none',
-            }} />
+        <section id="journey" className="section-pad relative overflow-hidden bg-background">
+            {/* Ambient Background Glow */}
+            <div className="absolute bottom-[-10%] right-[-8%] w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-[80px] pointer-events-none" />
 
-            <div className="container-xl" style={{ maxWidth: 900 }}>
+            <div className="container-xl max-w-4xl mx-auto px-4 relative z-10">
                 {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-                    <span style={{
-                        color: 'var(--color-brand-violet)', fontWeight: 700, fontSize: '0.78rem',
-                        letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif',
-                    }}>
-                        {t.tag}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeUp}
+                    className="text-center mb-16"
+                >
+                    <span className="text-brand-violet font-bold text-xs tracking-[0.18em] uppercase font-heading">
+                        <SplitText text={t.tag} />
                     </span>
-                    <h2 style={{
-                        fontFamily: 'Outfit, sans-serif', fontWeight: 800,
-                        fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', margin: '0.5rem 0 0',
-                        background: 'var(--hero-gradient)',
-                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                    }}>
-                        {t.title}
+                    <h2 className="font-heading font-extrabold text-3xl md:text-5xl mt-2 mb-4 bg-hero-gradient bg-clip-text text-transparent">
+                        <SplitText text={t.title} delay={0.3} />
                     </h2>
-                    <div className="section-divider" style={{
-                        background: 'linear-gradient(90deg, var(--color-brand-violet), var(--color-brand-cyan))',
-                        margin: '0.75rem auto 0',
-                    }} />
-                    <p
-                        style={{
-                            color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.7,
-                            fontFamily: 'Inter, sans-serif', maxWidth: 620, margin: '1.5rem auto 0',
-                        }}
-                    >
+                    <div className="w-24 h-1 bg-gradient-to-r from-brand-violet to-brand-cyan mx-auto mt-6 rounded-full" />
+
+                    <p className="text-muted text-base md:text-lg leading-relaxed font-body max-w-2xl mx-auto mt-8">
                         {t.intro.split(/<strong>(.*?)<\/strong>/g).map((part: string, i: number) =>
-                            i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>
+                            i % 2 === 1 ? <strong key={i} className="text-foreground font-semibold">{part}</strong> : <span key={i}>{part}</span>
                         )}
                     </p>
-                </div>
+                </motion.div>
 
-                {/* Timeline */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', position: 'relative' }}>
-                    <div style={{
-                        position: 'absolute', left: 26, top: 0, bottom: 0, width: 2,
-                        background: 'linear-gradient(to bottom, var(--color-brand-violet), var(--color-brand-cyan), var(--color-brand-emerald))',
-                        opacity: 0.25, borderRadius: 99,
-                    }} />
-                    {t.items.map((item, i) => (
-                        <ReflectionCard key={item.title} item={item} index={i} visible={visible} />
-                    ))}
+                {/* Timeline Container */}
+                <div ref={containerRef} className="relative mt-20">
+                    {/* Glowing animated line */}
+                    <div className="absolute left-[27px] md:left-[35px] top-0 bottom-0 w-[2px] bg-surface-hover rounded-full">
+                        <motion.div
+                            className="w-full bg-gradient-to-b from-brand-violet via-brand-cyan to-brand-emerald rounded-full origin-top relative"
+                            style={{ height: lineHeight }}
+                        >
+                            {/* Glowing tip */}
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-6 bg-brand-cyan rounded-full blur-[4px] opacity-70" />
+                        </motion.div>
+                    </div>
+
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-50px" }}
+                        variants={staggerContainer}
+                        className="flex flex-col gap-12 relative"
+                    >
+                        {t.items.map((item, i) => (
+                            <ReflectionCard key={item.title} item={item} index={i} />
+                        ))}
+                    </motion.div>
                 </div>
 
                 {/* Quote */}
-                <div style={{
-                    marginTop: '3.5rem', padding: '2rem 2.5rem', borderRadius: '1.5rem',
-                    background: 'var(--card-bg)', border: '1px solid var(--border)',
-                    display: 'flex', gap: '1.25rem', alignItems: 'flex-start',
-                }}>
-                    <span style={{ fontSize: '2.5rem', lineHeight: 1, flexShrink: 0 }}>✝️</span>
-                    <div>
-                        <p style={{
-                            fontFamily: 'Outfit, sans-serif', fontStyle: 'italic', fontWeight: 600,
-                            fontSize: '1.05rem', color: 'var(--color-foreground)', lineHeight: 1.6, margin: '0 0 0.4rem',
-                        }}>
-                            {t.quote}
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    variants={fadeUp}
+                    className="mt-20 p-8 md:p-10 rounded-3xl bg-surface border border-border flex gap-6 items-start relative overflow-hidden group"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-violet/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    <span className="text-4xl leading-none shrink-0 relative z-10">✝️</span>
+                    <div className="relative z-10">
+                        <p className="font-heading font-bold italic text-lg md:text-xl text-foreground leading-relaxed mb-3">
+                            <SplitText text={`"${t.quote}"`} delay={0.5} />
                         </p>
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'Inter, sans-serif' }}>
-                            {t.quoteRef}
+                        <span className="text-muted text-sm font-body uppercase tracking-wider font-semibold">
+                            — <SplitText text={t.quoteRef} delay={1.5} />
                         </span>
                     </div>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </section>
     );
 }
 
-function ReflectionCard({ item, index, visible }: {
+function ReflectionCard({ item, index }: {
     item: JourneyT['items'][number];
     index: number;
-    visible: boolean;
 }) {
-    const [hovered, setHovered] = useState(false);
-
     return (
-        <div style={{
-            display: 'flex', gap: '1.25rem', alignItems: 'flex-start',
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'translateX(0)' : 'translateX(-20px)',
-            transition: `opacity 0.6s ease ${index * 0.12}s, transform 0.6s ease ${index * 0.12}s`,
-        }}>
-            <div style={{
-                width: 54, height: 54, borderRadius: '50%', flexShrink: 0,
-                background: hovered ? item.glow : 'var(--glass-bg)',
-                border: `2px solid ${hovered ? item.border : 'var(--border)'}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1.35rem', transition: 'all 0.3s', zIndex: 1,
-                boxShadow: hovered ? `0 0 20px ${item.glow}` : 'none',
-            }}>
-                {item.icon}
-            </div>
+        <motion.div
+            variants={fadeUp}
+            className="flex gap-6 md:gap-10 items-start group relative"
+        >
+            {/* Timeline Node */}
+            <Magnetic strength={0.4} className="shrink-0 relative z-20">
+                <div
+                    className="w-14 h-14 md:w-[72px] md:h-[72px] rounded-2xl flex items-center justify-center text-2xl md:text-3xl relative transition-all duration-500 overflow-hidden"
+                    style={{
+                        backgroundColor: 'var(--card-bg)',
+                        borderColor: 'var(--border)',
+                        borderWidth: '2px',
+                    }}
+                >
+                    <div
+                        className="absolute inset-0 opacity-20 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                        style={{ background: item.glow }}
+                    />
+                    <span className="relative z-10 group-hover:scale-110 transition-transform duration-300 drop-shadow-lg">{item.icon}</span>
+                </div>
+            </Magnetic>
+
+            {/* Content Card */}
             <div
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
+                className="flex-1 rounded-3xl p-6 md:p-8 relative overflow-hidden transition-all duration-500 hover:-translate-y-1"
                 style={{
-                    flex: 1, borderRadius: '1.25rem', padding: '1.6rem',
-                    background: hovered ? item.glow : 'var(--card-bg)',
-                    border: `1px solid ${hovered ? item.border : 'var(--border)'}`,
-                    transition: 'all 0.3s ease', cursor: 'default',
-                    boxShadow: hovered ? `0 8px 32px ${item.glow}` : 'none',
+                    backgroundColor: 'var(--card-bg)',
+                    borderColor: 'var(--border)',
+                    borderWidth: '1px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
                 }}
             >
-                <span style={{
-                    fontSize: '0.7rem', fontWeight: 700, fontFamily: 'Inter, sans-serif',
-                    padding: '0.2rem 0.7rem', borderRadius: '99px',
-                    background: item.glow, border: `1px solid ${item.border}`,
-                    color: item.color, textTransform: 'uppercase', letterSpacing: '0.07em',
-                    display: 'inline-block', marginBottom: '0.75rem',
-                }}>
-                    {item.tag}
-                </span>
-                <h3 style={{
-                    fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.05rem',
-                    color: hovered ? item.color : 'var(--color-foreground)',
-                    margin: '0 0 0.75rem', transition: 'color 0.3s',
-                }}>
-                    {item.title}
-                </h3>
-                <p style={{
-                    color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7,
-                    fontFamily: 'Inter, sans-serif', margin: '0 0 1rem',
-                }}>
-                    {item.body}
-                </p>
-                <div style={{
-                    background: 'var(--glass-bg)', border: '1px solid var(--border)',
-                    borderRadius: '0.75rem', padding: '0.7rem 1rem',
-                    color: 'var(--color-foreground)', fontSize: '0.85rem',
-                    fontFamily: 'Inter, sans-serif', fontWeight: 500, lineHeight: 1.5,
-                }}>
-                    {item.lesson}
+                {/* Glow border on hover effect */}
+                <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: `linear-gradient(to bottom right, ${item.border}, transparent)` }}
+                />
+
+                <div className="relative z-10 flex flex-col items-start">
+                    <span
+                        className="text-xs font-bold font-body px-3 py-1 rounded-full uppercase tracking-wider mb-4 border"
+                        style={{
+                            backgroundColor: item.glow,
+                            borderColor: item.border,
+                            color: item.color,
+                        }}
+                    >
+                        {item.tag}
+                    </span>
+
+                    <h3
+                        className="font-heading font-extrabold text-xl md:text-2xl mb-3 transition-colors duration-300"
+                        style={{ color: 'var(--color-foreground)' }}
+                    >
+                        <SplitText text={item.title} delay={0.2} />
+                    </h3>
+
+                    <p className="text-muted text-sm md:text-base leading-relaxed font-body mb-6">
+                        {item.body}
+                    </p>
+
+                    <div className="bg-surface-hover/80 border border-border/50 rounded-xl p-4 md:p-5 w-full">
+                        <p className="text-foreground text-sm font-semibold font-body leading-relaxed flex gap-3">
+                            <span className="shrink-0 text-brand-cyan">💡</span>
+                            <span>{item.lesson}</span>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
