@@ -81,9 +81,9 @@ export function ContactSection({ t }: { t: ContactT }) {
                             className="flex flex-col gap-4"
                         >
                             {[
-                                { icon: '✉️', label: 'Email', value: 'christlowe6@gmail.com', href: 'mailto:christlowe6@gmail.com' },
-                                { icon: '📱', label: 'WhatsApp', value: '+237 678831868', href: 'https://wa.me/237678831868' },
-                                { icon: '💼', label: 'LinkedIn', value: 'Christ Lowe', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/' },
+                                { icon: '✉️', label: 'Email', value: (import.meta as any).env.VITE_CONTACT_EMAIL || 'Email', href: (import.meta as any).env.VITE_CONTACT_EMAIL ? `mailto:${(import.meta as any).env.VITE_CONTACT_EMAIL}` : '#' },
+                                { icon: '📱', label: 'WhatsApp', value: 'WhatsApp', href: (import.meta as any).env.VITE_WHATSAPP_LINK || '#' },
+                                { icon: '💼', label: 'LinkedIn', value: 'Profil', href: (import.meta as any).env.VITE_LINKEDIN_URL || '#' },
                                 { icon: '📍', label: 'Location', value: 'Douala, Cameroon', href: null },
                             ].map((item, index) => (
                                 <Magnetic key={item.label} strength={0.3}>

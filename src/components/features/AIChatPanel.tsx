@@ -86,19 +86,16 @@ export const AIChatPanel = ({ isOpen, onClose, lang, t }: AIChatPanelProps) => {
         setIsLoading(true);
 
         try {
-            const history = messages.map(m => ({
-                role: m.role === 'assistant' ? 'model' as const : 'user' as const,
-                parts: [{ text: m.content }],
-            }));
+            let prompt = `${t.chat.systemInstruction}\n\n`;
+            messages.forEach(m => {
+                prompt += `${m.role === 'user' ? 'User' : 'POWER'}: ${m.content}\n`;
+            });
+            prompt += `User: ${userText}\nPOWER:`;
 
-            const resp = await fetch('/api/chat', {
+            const resp = await fetch('/api/ai/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: userText,
-                    history,
-                    systemInstruction: t.chat.systemInstruction,
-                }),
+                body: JSON.stringify({ prompt, asJson: false }),
             });
 
             const data = await resp.json();

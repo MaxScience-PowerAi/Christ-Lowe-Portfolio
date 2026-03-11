@@ -19,12 +19,6 @@ interface Message {
 
 const GEMINI_MODEL = "gemini-2.0-flash";
 
-async function getAI() {
-    const { GoogleGenAI } = await import("@google/genai");
-    const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || '';
-    return new GoogleGenAI({ apiKey });
-}
-
 export const CommunityPortal = ({ lang, t, onBack }: CommunityPortalProps) => {
     const [step, setStep] = useState(0);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -105,28 +99,16 @@ export const CommunityPortal = ({ lang, t, onBack }: CommunityPortalProps) => {
 
     const validateWithAI = async (question: string, answer: string): Promise<{ isValid: boolean; feedback: string }> => {
         try {
-            const ai = await getAI();
-            const { Type } = await import("@google/genai");
-            const prompt = `Tu es POWER, l'assistante IA de PowerAi. L'utilisateur a répondu "${answer}" à la question "${question}". 
-      Évalue si la réponse montre une vraie compréhension du projet PowerAi (IA au Cameroun, B2B, formation jeunes, communauté).
-      Réponds en JSON: { "isValid": true/false, "feedback": "message d'encouragement ou demande de précision courte" }`;
+            const prompt = `Tu es POWER, l'assistante IA de PowerAi. L'utilisateur a répondu "${answer}" à la question "${question}". \n      Évalue si la réponse montre une vraie compréhension du projet PowerAi (IA au Cameroun, B2B, formation jeunes, communauté).\n      Réponds en JSON: { "isValid": true/false, "feedback": "message d'encouragement ou demande de précision courte" }`;
 
-            const response = await ai.models.generateContent({
-                model: GEMINI_MODEL,
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            isValid: { type: Type.BOOLEAN },
-                            feedback: { type: Type.STRING }
-                        },
-                        required: ["isValid", "feedback"]
-                    }
-                }
+            const resp = await fetch('/api/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, asJson: true })
             });
-            return JSON.parse(response.text || '{"isValid":true,"feedback":""}');
+            if (!resp.ok) throw new Error("API Error");
+            const data = await resp.json();
+            return JSON.parse(data.text || '{"isValid":true,"feedback":""}');
         } catch {
             return { isValid: true, feedback: isEn ? "Noted, let's continue!" : "Noté, continuons !" };
         }
@@ -134,17 +116,17 @@ export const CommunityPortal = ({ lang, t, onBack }: CommunityPortalProps) => {
 
     const generateAIAssessment = async (): Promise<string> => {
         try {
-            const ai = await getAI();
             const c = collected.current;
-            const prompt = `Tu es POWER, l'IA de PowerAi. Génère une évaluation concise (2-3 phrases max) de ce candidat:
-      Nom: ${c.name}, Situation: ${c.situation}, Apport: ${c.contribution}, Compréhension: ${c.understanding}
-      Évalue son potentiel pour rejoindre PowerAi. Sois positif mais objectif. Réponds en ${isEn ? 'anglais' : 'français'}.`;
+            const prompt = `Tu es POWER, l'IA de PowerAi. Génère une évaluation concise (2-3 phrases max) de ce candidat:\n      Nom: ${c.name}, Situation: ${c.situation}, Apport: ${c.contribution}, Compréhension: ${c.understanding}\n      Évalue son potentiel pour rejoindre PowerAi. Sois positif mais objectif. Réponds en ${isEn ? 'anglais' : 'français'}.`;
 
-            const response = await ai.models.generateContent({
-                model: GEMINI_MODEL,
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
+            const resp = await fetch('/api/ai/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, asJson: false })
             });
-            return response.text?.trim() || "Candidat prometteur.";
+            if (!resp.ok) throw new Error("API Error");
+            const data = await resp.json();
+            return data.text?.trim() || "Candidat prometteur.";
         } catch {
             return `Candidat ${collected.current.name} — profil intéressant pour la communauté PowerAi.`;
         }
@@ -357,8 +339,8 @@ export const CommunityPortal = ({ lang, t, onBack }: CommunityPortalProps) => {
                                 </div>
                             )}
                             <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                                    ? 'bg-cyan-600 text-white rounded-tr-sm'
-                                    : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-200 rounded-tl-sm'
+                                ? 'bg-cyan-600 text-white rounded-tr-sm'
+                                : 'bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-zinc-200 rounded-tl-sm'
                                 }`}>
                                 {msg.text}
                             </div>

@@ -117,9 +117,9 @@ export function HeroSection({ t }: { t: any }) {
                     <motion.div variants={fadeUp} className="mt-12 flex flex-wrap justify-center gap-6 hidden sm:flex">
                         {[
                             { icon: <Github size={18} />, href: 'https://github.com/MaxScience-PowerAi', label: 'GitHub' },
-                            { icon: <Linkedin size={18} />, href: 'https://www.linkedin.com/in/christ-lowe-10a210389/', label: 'LinkedIn' },
-                            { icon: <Mail size={18} />, href: 'mailto:christlowe6@gmail.com', label: 'Email' },
-                            { icon: <MessageCircle size={18} />, href: 'https://wa.me/237678831868', label: 'WhatsApp' },
+                            { icon: <Linkedin size={18} />, href: (import.meta as any).env.VITE_LINKEDIN_URL || '#', label: 'LinkedIn' },
+                            { icon: <Mail size={18} />, href: (import.meta as any).env.VITE_CONTACT_EMAIL ? `mailto:${(import.meta as any).env.VITE_CONTACT_EMAIL}` : '#', label: 'Email' },
+                            { icon: <MessageCircle size={18} />, href: (import.meta as any).env.VITE_WHATSAPP_LINK || '#', label: 'WhatsApp' },
                         ].map((s, i) => (
                             <Magnetic key={i} strength={0.5}>
                                 <a

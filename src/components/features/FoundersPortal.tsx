@@ -58,14 +58,24 @@ export const FoundersPortal = ({ t, lang, onBack, theme }: FoundersPortalProps) 
     const [moderating, setModerating] = useState<number | null>(null);
     const [storedPassword, setStoredPassword] = useState('');
 
-    // Try auto-login from sessionStorage on mount
+    // Try auto-login from cookie on mount
     useEffect(() => {
-        const saved = sessionStorage.getItem('powerai_founder_key') || '';
-        if (saved) {
-            setPassword(saved);
-            setStoredPassword(saved);
-            loginWith(saved);
-        }
+        const attemptAutoLogin = async () => {
+            try {
+                const resp = await fetch('/api/founders/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    setApplications(data.applications || []);
+                    setIsAuthorized(true);
+                    fetchMembers();
+                }
+            } catch { }
+        };
+        attemptAutoLogin();
     }, []);
 
     const loginWith = async (pass: string) => {
@@ -82,10 +92,8 @@ export const FoundersPortal = ({ t, lang, onBack, theme }: FoundersPortalProps) 
                 const data = await resp.json();
                 setApplications(data.applications || []);
                 setIsAuthorized(true);
-                sessionStorage.setItem('powerai_founder_key', pass.trim());
                 fetchMembers();
             } else {
-                sessionStorage.removeItem('powerai_founder_key');
                 setLoginError(t.report.communityPortal.foundersPortal.error);
             }
         } catch {
@@ -107,7 +115,7 @@ export const FoundersPortal = ({ t, lang, onBack, theme }: FoundersPortalProps) 
             const resp = await fetch('/api/founders/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: storedPassword || password }),
+                body: JSON.stringify({}),
             });
             if (resp.ok) {
                 const d = await resp.json();
@@ -120,11 +128,10 @@ export const FoundersPortal = ({ t, lang, onBack, theme }: FoundersPortalProps) 
     const handleModeration = async (id: number, status: 'accepted' | 'rejected') => {
         setModerating(id);
         try {
-            const pass = storedPassword || password;
             const resp = await fetch(`/api/applications/${id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json', 'x-founders-password': pass },
-                body: JSON.stringify({ moderation_status: status, password: pass }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ moderation_status: status }),
             });
             if (resp.ok) {
                 setApplications(prev =>
@@ -138,11 +145,10 @@ export const FoundersPortal = ({ t, lang, onBack, theme }: FoundersPortalProps) 
         setModerating(null);
     };
 
-    const handleLogout = () => {
-        sessionStorage.removeItem('powerai_founder_key');
+    const handleLogout = async () => {
+        await fetch('/api/founders/logout', { method: 'POST' });
         setIsAuthorized(false);
         setPassword('');
-        setStoredPassword('');
         setApplications([]);
     };
 

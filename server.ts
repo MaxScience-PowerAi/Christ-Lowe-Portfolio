@@ -15,6 +15,14 @@ const db = new Database("applications.db");
 
 // Initialize database
 db.exec(`
+  CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT,
+    message TEXT,
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE TABLE IF NOT EXISTS applications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
@@ -232,6 +240,55 @@ async function startServer() {
     } catch (error) {
       console.error("Error fetching applications:", error);
       res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  });
+
+  app.post("/api/ai/generate", async (req, res) => {
+    try {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) return res.status(500).json({ error: "API key missing in environment" });
+      
+      const { prompt, asJson } = req.body;
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const config: any = {};
+      if (asJson) {
+        config.responseMimeType = "application/json";
+        config.responseSchema = {
+            type: Type.OBJECT,
+            properties: {
+                isValid: { type: Type.BOOLEAN },
+                feedback: { type: Type.STRING }
+            },
+            required: ["isValid", "feedback"]
+        };
+      }
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        config
+      });
+      res.json({ text: response.text });
+    } catch (error) {
+      console.error("AI Error:", error);
+      res.status(500).json({ error: "Failed to generate AI content" });
+    }
+  });
+
+  app.post("/api/contact", (req, res) => {
+    const { name, email, message } = req.body;
+    if (!name || !email || !message) return res.status(400).json({ error: "Missing required fields" });
+    try {
+      db.prepare("INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)").run(
+        normalizeText(name, 120),
+        normalizeText(email, 200),
+        normalizeText(message, 10000)
+      );
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Contact form error:", error);
+      res.status(500).json({ error: "Failed to save message" });
     }
   });
 

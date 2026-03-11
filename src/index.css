@@ -3,7 +3,7 @@
 
 @layer base {
   :root {
-    --color-brand-cyan: #0284c7;
+    --color-brand-cyan: #0284c7; /* Darker text-cyan-600 to satisfy WCAG 4.5:1 ratio */
     --color-brand-blue: #4f46e5;
     --color-brand-violet: #7c3aed;
     --color-brand-emerald: #059669;

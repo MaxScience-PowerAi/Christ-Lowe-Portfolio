@@ -59,7 +59,7 @@ export function PortfolioFooter({ t }: { t: FooterT }) {
                             <div className="flex flex-col gap-3">
                                 {[
                                     { label: 'GitHub', href: 'https://github.com/MaxScience-PowerAi' },
-                                    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/christ-lowe-10a210389/' },
+                                    { label: 'LinkedIn', href: (import.meta as any).env.VITE_LINKEDIN_URL || '#' },
                                     { label: 'PowerAi', href: '#' },
                                 ].map(link => (
                                     <a

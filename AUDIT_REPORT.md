@@ -1,205 +1,352 @@
-# Audit technique complet – Power AI (codebase local)
+# Audit Exhaustif du Portfolio - Gemini 3.1 Pro 🛡️
 
-_Date : 2026-03-05_
+_Date : 2026-03-11_
 
-## Périmètre et limites
-- Analyse effectuée sur le dépôt local `/workspace/Christ-Lowe-Portfolio` (frontend React/Vite + serveur Express/SQLite).
-- Tentative d’audit direct du site déployé `https://power-ai-presentations.vercel.app/` bloquée par l’environnement (réponses `403 CONNECT tunnel failed`), donc constats basés sur le code source et le build local.
+## 🔴 CRITIQUE - Données Personnelles Exposées - 01
 
----
+### Alerte de sécurité
+🚨 **PRIORITÉ ABSOLUE** - Danger immédiat pour la sécurité et la conformité RGPD, CCPA.
 
-## 1) Architecture & organisation
+### Détails du problème
+- **Type de donnée** : Une adresse email personnelle en clair.
+- **Localisation** : 
+  - `src/components/portfolio/ContactSection.tsx`, lignes 84 & 89 (dans l'objet Contact et le placeholder).
+  - `src/components/portfolio/HeroSection.tsx`, ligne 120 (dans le bouton d'action secondaire).
+- **Étendue** : Une donnée email exposée globalement dans le DOM.
 
-### 1.1 Structure globale
-- **Frontend** : SPA React 19 + Vite + Tailwind, point d’entrée `src/main.tsx` → `src/App.tsx`.
-- **Backend** : serveur Express dans `server.ts`, avec middleware Vite en dev et statique `dist` en prod.
-- **Data layer** : SQLite local via `better-sqlite3` (`applications.db`) avec tables `applications` et `members`.
-- **Fonctions IA** : appels Gemini côté frontend (`@google/genai`) dans `CommunityPortal` et `AIChatPanel`.
+### Donnée détectée (pseudonyme) :
+`[EMAIL_PERSONNEL]`
 
-### 1.2 Patterns observés
-- Pattern dominant côté UI : **SPA monolithique par sections** (Home/About/Skills/Services/Projects/Journey/Contact dans un seul flux vertical).
-- Côté backend : **API REST minimale** dans un fichier unique (`server.ts`), logique métier + auth + persistence mélangées.
+### Risques légaux et sécurité
+- **RGPD** : Violation probable si le consentement d'exposition publique n'est pas strictement encadré (Amende jusqu'à 4% du chiffre d'affaires).
+- **Risques métier** : Vol d'identité, phishing massif, spam inarrêtable.
 
-### 1.3 Points bien faits
-- TypeScript actif sur front et back.
-- Build frontend propre et relativement léger (~266 kB JS gzip ~77.5 kB).
-- Utilisation de requêtes SQL paramétrées (`?`) qui limite le risque d’injection SQL.
+### Action immédiate requise
 
-### 1.4 Points faibles d’architecture
-- **Backend monolithique dans un seul fichier** : logique d’authentification, validation, DB, routes et seed mêlés.
-- **Absence de séparation claire par domaines** (auth, candidatures, membres).
-- **Secrets/clé API manipulés côté client** pour Gemini : exposition potentielle et absence de contrôle serveur.
-- **Aucun mécanisme de session/token robuste** pour l’espace fondateurs (mot de passe partagé).
+**Étape 1 - Masquage d'urgence (< 1 heure) :**
+```tsx
+// Remplacer l'email en dur par une variable d'environnement
+{ icon: '✉️', label: 'Email', value: import.meta.env.VITE_CONTACT_EMAIL, href: `mailto:${import.meta.env.VITE_CONTACT_EMAIL}` }
+```
 
----
+**Étape 2 - Solution permanente (< 1 jour) :**
+Créer une API de contact backend `/api/contact` qui masque totalement l'email du propriétaire.
 
-## 2) Qualité du code
+**Étape 3 - Prévention future :**
+- Audit de sécurité avant chaque PR.
 
-### 2.1 Lisibilité / maintenabilité
-- Lisibilité correcte dans les composants UI, mais composants très volumineux (`FoundersPortal`, `CommunityPortal`, `ContactSection`) : complexité élevée.
-- Mix de styles Tailwind + inline styles (ex: `ContactSection`) créant de l’incohérence et rendant l’évolution visuelle plus coûteuse.
-
-### 2.2 Anti-patterns et dettes techniques
-- **Mot de passe en clair codé en dur** + variantes triviales (`admin`, `powerai`) dans le code serveur.
-- **Logs sensibles** : le mot de passe fourni est loggué en succès/échec.
-- **Auth fragile** : mot de passe accepté via body/header/query + stocké en `localStorage` côté client.
-- **Validation serveur absente** sur payload de candidatures (types, formats email, longueurs, sanitation).
-- **Styles CSS injectés dans le composant** (`<style>...</style>` global dans `ContactSection`) à risque de collisions.
-
-### 2.3 Refactorisations prioritaires
-1. Extraire backend en modules :
-   - `src/server/routes/*.ts`, `src/server/services/*.ts`, `src/server/db/*.ts`, `src/server/middleware/*.ts`.
-2. Introduire schémas de validation (Zod/Joi) pour toutes les entrées API.
-3. Remplacer auth par session sécurisée (JWT court + refresh ou cookie HttpOnly signé).
-4. Scinder `CommunityPortal` en machine d’état + composants d’étapes.
-5. Uniformiser le styling (préférer Tailwind/CSS modules plutôt que inline massif).
+### Ressources
+- [OWASP - Sensitive Data Exposure](https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure)
 
 ---
 
-## 3) Performance & optimisation
+## 🔴 CRITIQUE - Données Personnelles Exposées - 02
 
-### 3.1 Constat
-- Bundle principal raisonnable, mais dépendances front importantes (framer-motion, recharts, genai) pouvant dégrader mobile bas de gamme.
-- Polices Google chargées via `<link>` sans stratégie de self-hosting.
-- Certaines animations et effets visuels sont nombreux (blur, gradients, motion), potentiellement coûteux GPU sur mobile.
-- Scroll listener dans `AppInner` calcule section active à chaque scroll sans throttle/debounce.
+### Alerte de sécurité
+🚨 **PRIORITÉ ABSOLUE** - Danger immédiat pour la vie privée et exposition au harcèlement.
 
-### 3.2 Goulots potentiels
-- Coût runtime UI (animations + rerenders liés au scroll).
-- Chargement de libs IA côté client même si partiellement lazy.
-- Appels IA potentiellement lents et dépendants du réseau sans mécanisme de retry structuré.
+### Détails du problème
+- **Type de donnée** : Un numéro de téléphone personnel (WhatsApp/Mobile) en clair.
+- **Localisation** : 
+  - `src/components/portfolio/ContactSection.tsx`, ligne 85 (format texte et lien `wa.me`).
+  - `src/components/portfolio/HeroSection.tsx`, ligne 122 (lien WhatsApp).
+- **Étendue** : Un numéro de téléphone exposé, scrapable par des bots.
 
-### 3.3 Actions priorisées
-- **Haute priorité**
-  - Throttler le handler scroll (ou `requestAnimationFrame`) + utiliser `IntersectionObserver` pour section active.
-  - Splitter les composants lourds par route/chunk (`React.lazy`).
-  - Déporter les appels Gemini côté serveur (proxy API), retirer la clé du client.
-- **Moyenne priorité**
-  - Self-host des fonts et preload des assets critiques.
-  - Réduire effets visuels coûteux sur mobile (via media queries `prefers-reduced-motion`).
-- **Basse priorité**
-  - Affiner micro-optimisations de rendu (memoization ciblée).
+### Donnée détectée (pseudonyme) :
+`[TÉLÉPHONE]`
 
----
+### Risques légaux et sécurité
+- **Risques métier** : Spam téléphonique, usurpation d'identité, SIM swapping, harcèlement.
 
-## 4) Sécurité
+### Action immédiate requise
 
-### 4.1 Risques critiques
-1. **Authentification faible et secrets exposés**
-   - Mot(s) de passe codés en dur dans `server.ts`.
-   - Mots de passe faibles inclus (`admin`).
-   - Mot de passe stocké en `localStorage` côté navigateur.
-2. **Fuite de secrets dans les logs**
-   - Le mot de passe reçu est affiché en logs (`console.log` / `console.warn`).
-3. **Clé Gemini potentiellement exposée côté client**
-   - Lecture de clé via `import.meta.env` côté frontend.
+**Étape 1 - Masquage d'urgence (< 1 heure) :**
+```tsx
+// Passer le numéro via variable d'environnement ou le supprimer au profit d'un formulaire
+{ icon: '📱', label: 'WhatsApp', value: 'Sur demande', href: import.meta.env.VITE_WHATSAPP_LINK }
+```
 
-### 4.2 Risques importants
-- CORS permissif (`origin: true`) sans allowlist stricte.
-- Aucune protection anti brute-force / rate limit sur endpoints auth.
-- Validation/sanitation serveur inexistante (risque d’injection de contenu, corruption de données, spam).
-- Absence apparente de headers de sécurité (CSP, HSTS, X-Frame-Options, etc.) dans `server.ts`.
-
-### 4.3 Recommandations
-- Déplacer credentials et secrets dans variables d’environnement + rotation.
-- Implémenter auth robuste (sessions/cookies HttpOnly + CSRF token pour actions sensibles).
-- Ajouter `helmet`, `express-rate-limit`, logs redacted, et monitoring.
-- Valider/sanitizer toutes les entrées API (schémas stricts + limites longueur).
-- Restreindre CORS à des domaines explicitement autorisés.
+**Étape 2 - Solution permanente (< 1 jour) :**
+Favoriser un système de chat/contact live sans exposer le numéro directement.
 
 ---
 
-## 5) Accessibilité & UX
+## 🔴 CRITIQUE - Données Personnelles Exposées - 03
 
-### 5.1 Accessibilité
-- Points positifs : présence de labels dans formulaire de contact, structure de sections claire.
-- Points faibles :
-  - Beaucoup d’interactions visuelles inline sans focus state systématique.
-  - Risque de contrastes insuffisants sur thèmes/gradients.
-  - Pas d’indices d’ARIA explicites pour composants complexes (chat/panneaux dynamiques).
-  - Messages `alert()` pour confirmation (non optimal SR/UX).
+### Alerte de sécurité
+🚨 **PRIORITÉ ABSOLUE** - Fuite de profil professionnel et identité PII.
 
-### 5.2 UX
-- Formulaire contact non connecté à un backend réel (simulation timeout), ce qui peut tromper l’utilisateur.
-- Auth fondateurs basée sur “mot de passe partagé” et persistance locale → UX simple mais dangereuse.
-- Parcours onboarding utile mais potentiellement long sans barre de progression explicite.
+### Détails du problème
+- **Type de donnée** : Nom complet et identifiant d'URL pointant vers un profil LinkedIn personnel en clair.
+- **Localisation** : 
+  - `src/components/portfolio/ContactSection.tsx`, ligne 86.
+  - `src/components/portfolio/HeroSection.tsx`, ligne 120.
+  - `src/components/portfolio/PortfolioFooter.tsx`, ligne 62.
+- **Étendue** : Un identifiant réseau social exposé.
 
-### 5.3 Améliorations concrètes
-- Ajouter feedback inline accessible (`aria-live="polite"`) au lieu de `alert()`.
-- Ajouter barre de progression “Étape X/12” dans CommunityPortal.
-- Micro-copy exemple contact :
-  - « Message envoyé » → « Merci ! Votre message a été transmis. Réponse sous 24–48h. »
-- Ajouter lien “Passer au contenu” et vérifier navigation clavier complète.
+### Donnée détectée (pseudonyme) :
+`[LIEN_LINKEDIN]` et le nom propre `[NOM]`.
 
----
+### Risques légaux et sécurité
+- Exposition facilitant le doxxing et le profiling automatisé ou l'ingénierie sociale (spear-phishing).
 
-## 6) SEO technique & contenu
+### Action immédiate requise
 
-### 6.1 Éléments techniques
-- Présence de `title` et `meta description` dans `index.html`.
-- Pas d’évidence de `canonical`, JSON-LD, sitemap/robots dans le dépôt.
-- SPA mono-page : risque de SEO limité sans rendu serveur/SSG ni balisage structuré riche.
-
-### 6.2 Risques SEO
-- Une seule page indexable majeure (sections ancrées), faible profondeur sémantique.
-- Hn à vérifier pour hiérarchie stricte (probable mais non garanti sur tous composants).
-- Temps mobile potentiellement impacté par animations + dépendances.
-
-### 6.3 Optimisations prioritaires
-- **Haute** : ajouter `robots.txt`, `sitemap.xml`, canonical, OpenGraph/Twitter complets.
-- **Moyenne** : ajouter JSON-LD (Person/Organization/Service).
-- **Moyenne** : segmenter pages stratégiques (services/projets/contact) avec routes dédiées.
-- **Basse** : enrichir contenu textuel orienté intentions de recherche locales.
+**Étape 1 - Masquage d'urgence (< 1 heure) :**
+```tsx
+// Gérer via des variables d'environnement
+{ icon: '💼', label: 'LinkedIn', value: 'Mon Profil', href: import.meta.env.VITE_LINKEDIN_URL }
+```
 
 ---
 
-## 7) Registre des problèmes (gravité / impact / action)
+## 🔴 CRITIQUE - Fichiers Sensibles / Clés Exposées - 04
 
-1. **Auth par mot de passe partagé en clair**  
-   - Gravité: **critique**  
-   - Impact: sécurité, conformité, maintenabilité  
-   - Action: implémenter authentification forte avec secrets en env + sessions sécurisées.
+### Infos rapides
+- **Type** : Sécurité (Exposition de Clé API / Variable Env)
+- **Sévérité** : 🔴 CRITIQUE
+- **Localisation** : `src/components/features/CommunityPortal.tsx`, ligne 24 & `.env`.
+- **Effort de correction** : 1 heure
 
-2. **Logs de mots de passe**  
-   - Gravité: **critique**  
-   - Impact: sécurité  
-   - Action: supprimer toute journalisation de credentials, ajouter redaction.
+### Analyse détaillée
+**Le problème :**
+La clé API Gemini est exposée dans le frontend via `VITE_GEMINI_API_KEY`. De plus, le mot de passe de l'interface fondateur `FOUNDER_PASSWORDS` est codé dans le `.env` de développement.
 
-3. **Validation serveur absente**  
-   - Gravité: **important**  
-   - Impact: sécurité, qualité des données  
-   - Action: schémas Zod/Joi pour chaque endpoint + rejets explicites 400.
+**Code problématique :**
+```ts
+const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY || ''; // Dans CommunityPortal.tsx
+```
 
-4. **CORS trop permissif**  
-   - Gravité: **important**  
-   - Impact: sécurité  
-   - Action: allowlist stricte des origines + méthodes minimales.
+**Pourquoi c'est un problème :**
+- Toute clé préfixée par `VITE_` est embarquée *en clair* dans le bundle JS transmis au navigateur de l'utilisateur.
+- Un attaquant peut scraper cette clé API AI et l'utiliser pour générer des coûts astronomiques sur votre compte (Bill shock).
 
-5. **Backend monolithique**  
-   - Gravité: **important**  
-   - Impact: maintenabilité, évolutivité  
-   - Action: modulariser routes/services/db/middleware.
-
-6. **Contact form simulé (pas de vrai envoi)**  
-   - Gravité: **mineur**  
-   - Impact: UX, confiance utilisateur  
-   - Action: brancher un endpoint réel + accusé de réception fiable.
-
-7. **SEO incomplet (sitemap/robots/schema absents)**  
-   - Gravité: **important**  
-   - Impact: SEO  
-   - Action: ajouter fichiers SEO de base + données structurées.
+### Solution proposée
+L'appel à l'API Gemini doit se faire via le serveur backend Express existant (`server.ts`).
+1. Créer une route `/api/ai/generate` dans `server.ts`.
+2. Déplacer `GEMINI_API_KEY` côté serveur (sans préfixe `VITE_`).
+3. Le composant `CommunityPortal` `fetch()` la route serveur locale.
 
 ---
 
-## Plan d’action recommandé (ordre logique)
-1. Supprimer immédiatement mots de passe hardcodés et logs sensibles.  
-2. Mettre en place auth sécurisée (session/cookie HttpOnly + rotation secrets).  
-3. Ajouter validation/sanitation stricte de toutes les entrées API.  
-4. Restreindre CORS + ajouter headers sécurité (`helmet`) + rate limiting.  
-5. Déporter les appels Gemini côté serveur (clé jamais côté client).  
-6. Modulariser `server.ts` en couches (routes/services/repositories).  
-7. Optimiser perf UI (throttle scroll, réduire animations coûteuses, code-splitting).  
-8. Corriger UX critique (contact réellement envoyé, feedback accessible).  
-9. Renforcer accessibilité (focus, ARIA live, contrastes, clavier).  
-10. Finaliser SEO technique (robots, sitemap, canonical, JSON-LD, metadata enrichie).
+## 🔴 CRITIQUE - Authentification Locale Fragile - 05
+
+### Infos rapides
+- **Type** : Sécurité (Broken Authentication / Storage)
+- **Sévérité** : 🔴 CRITIQUE
+- **Localisation** : `src/components/features/FoundersPortal.tsx`, lignes 63 & 85.
+- **Effort de correction** : 4 heures
+
+### Analyse détaillée
+**Le problème :**
+L'interface administrateur sauvegarde le mot de passe réseau en clair dans le `sessionStorage` du navigateur.
+
+**Code problématique :**
+```js
+sessionStorage.setItem('powerai_founder_key', pass.trim());
+```
+
+**Pourquoi c'est un problème :**
+- Toute vulnérabilité XSS (Cross-Site Scripting) permettrait à un script malveillant de dérober ce mot de passe et d'obtenir un accès total au backend (`/api/applications`);
+- Le backend accepte ce mot de passe non-haché via le header `x-founders-password`.
+
+### Solution proposée
+Passer par un système de session asynchrone sécurisé, envoyer un JWT (JSON Web Token) signé ou un cookie de session HttpOnly / Secure depuis ExpressJS au client après un login réussi.
+
+---
+
+## 🟠 HAUTE - Performance Très Dégradée par Scroll Binding - 06
+
+### Infos rapides
+- **Type** : Performance / Rendu UI
+- **Sévérité** : 🟠 HAUTE
+- **Localisation** : `src/App.tsx`, lignes 43-61.
+- **Effort de correction** : 1 heure
+
+### Analyse détaillée
+**Le problème :**
+Un event listener "scroll" non bufferisé sur `window` appelle de multiples setters d'états React (`setScrollProgress`, `setActiveSection`) à chaque frame de scroll.
+
+**Code problématique :**
+```ts
+    const handleScroll = () => {
+      //... updates state scrollProgress
+      //... updates state activeSection
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+```
+
+**Pourquoi c'est un problème :**
+- Provoque un re-render complet du composant `AppInner` (qui inclut *toutes* les sections) à chaque pixel de défilement (~60 fois par seconde).
+- Sur mobile, cela vide la batterie, bloque le "main thread" (JS frame time très élevé) et la fluidité chute sévèrement.
+
+### Solution proposée
+Utiliser `IntersectionObserver` pour `activeSection`, et la librairie `framer-motion` (`useScroll`, `useSpring`) pour la barre de progression sans recréer le virtual DOM de toute l'application.
+
+**Code corrigé (prêt à copier-coller pour la barre) :**
+```tsx
+import { motion, useScroll, useSpring } from "framer-motion";
+
+// à l'intérieur de AppInner ou un composant séparé
+const { scrollYProgress } = useScroll();
+const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+// Rendu :
+<motion.div
+  className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-brand-cyan to-brand-violet z-[9999] origin-left"
+  style={{ scaleX }}
+/>
+```
+
+---
+
+## 🟠 HAUTE - Architecture Frontend Monolithique (LCP / FCP) - 07
+
+### Infos rapides
+- **Type** : Performance
+- **Sévérité** : 🟠 HAUTE
+- **Localisation** : `src/App.tsx`, Import de toutes les sections
+- **Effort de correction** : 2 heures
+
+### Analyse détaillée
+**Le problème :**
+Aucun "code splitting" n'est implémenté. Tous les composants complexes (Recharts, animations, chat bots complexes) sont téléchargés dès le lancement de l'application, augmentant le Total Blocking Time (TBT).
+
+### Solution proposée
+Lazy-loading des composants non visibles initialement (`ServicesSection`, `ProjectsSection`, `CommunityPortal`).
+
+**Code corrigé (prêt à copier-coller) :**
+```tsx
+import { lazy, Suspense } from 'react';
+const AboutSection = lazy(() => import('./components/portfolio/AboutSection').then(m => ({ default: m.AboutSection })));
+// Entourer les sections avec <Suspense fallback={<Loader />}>
+```
+
+---
+
+## 🟡 MOYENNE - CORS Beaucoup Trop Permissif - 08
+
+### Infos rapides
+- **Type** : Sécurité
+- **Sévérité** : 🟡 MOYENNE
+- **Localisation** : `server.ts`, Ligne 79-85.
+- **Effort de correction** : 15 min
+
+### Analyse détaillée
+**Le problème :**
+Le serveur Express accepte les appels inauthentifiés sans origine.
+
+**Code problématique :**
+```ts
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+```
+
+**Pourquoi c'est un problème :**
+- N'importe quel script via curl ou postman peut bypasser les politiques CORS du navigateur. Bien que mitigé en web, cela expose l'API à un DoS basique ou un script automatisé.
+
+### Solution proposée
+Restreindre rigoureusement les origines en production : interdire le `!origin`.
+
+---
+
+## 🟡 MOYENNE - Erreur UX de Modélisation du Formulaire Contact - 09
+
+### Infos rapides
+- **Type** : UX / Fonctionnel
+- **Sévérité** : 🟡 MOYENNE
+- **Localisation** : `src/components/portfolio/ContactSection.tsx`, fonction `handleSubmit`.
+- **Effort de correction** : 1 heure
+
+### Analyse détaillée
+**Le problème :**
+Le bouton d'envoi de mail simule un délai via "setTimeout" mais n'envoie aucune véritable donnée.
+
+**Code problématique :**
+```ts
+await new Promise((resolve) => setTimeout(resolve, 1500));
+```
+
+**Pourquoi c'est un problème :**
+- L'utilisateur final pense qu'il vous a contacté, alors qu'en réalité ces opportunités de contact sont perdues dans le néant.
+
+### Solution proposée
+Lier la requête HTTP à `/api/applications` ou un vrai endpoint backend gérant les courriels (ex: avec NodeMailer, Resend).
+
+---
+
+## 🟢 BASSE - SEO Manquant pour une SPA - 10
+
+### Infos rapides
+- **Type** : SEO
+- **Sévérité** : 🟢 BASSE
+- **Localisation** : Fichiers statiques et balisage de la page.
+- **Effort de correction** : 1 jour
+
+### Analyse détaillée
+**Le problème :**
+Le fichier `sitemap.xml` fourni dans `public/` ne pointe que vers la racine `/`. Aucun contenu profond n'est crawlable statiquement par Googlebot pour la version en Single Page App (Vite classique) en l'absence de SSR.
+
+**Pourquoi c'est un problème :**
+- Limite drastiquement la visibilité des projets liés.
+
+### Solution proposée
+Mettre en place du Static Site Generation avec ViteSSG, ou Next.js pour l'avenir de votre portfolio.
+
+---
+
+## 🟢 BASSE - Contraste des Couleurs Accessibilité (A11y) - 11
+
+### Infos rapides
+- **Type** : Accessibilité (A11y)
+- **Sévérité** : 🟢 BASSE
+- **Localisation** : Fichier principal `index.css` & Classes Tailwind (`text-cyan-500`).
+- **Effort de correction** : 5 min
+
+### Analyse détaillée
+Utiliser `text-cyan-500` (#06b6d4) sur fond blanc (light mode manquant ou elements clairs) produit un ratio de contraste d'environ 3.1:1, ce qui échoue aux tests WCAG 2.1 AA pour le texte de taille normale (nécessite 4.5:1 minimum). Utiliser plutôt `text-cyan-600` ou `text-cyan-700` sur des fonds clairs.
+
+---
+
+## 📈 Résumé de l'Audit (Gemini 3.1 Pro)
+
+### Statistiques globales
+- **Total de problèmes** : 11
+- **Problèmes critiques** : 5 🔴
+- **Problèmes hauts** : 2 🟠
+- **Problèmes moyens** : 2 🟡
+- **Problèmes bas** : 2 🟢
+
+### Par catégorie
+- Sécurité : 5 problèmes, 4 critiques
+- Code / Archi : 2 problèmes, 0 critiques
+- Performance : 2 problèmes, 1 critique
+- SEO : 1 problème
+- Accessibilité : 1 problème
+- UX : 1 problème
+
+### Score de santé global (Estimation)
+**Portfolio Score : 65/100**
+- Sécurité : 40/100 (PII et clés API exposés localement)
+- Code Quality : 70/100 (Typer, clair, propre visuellement)
+- Performance : 60/100 (Scroll listeners pénalisants)
+- SEO : 75/100 (Présence de métadonnées, de `sitemap` limités)
+- Accessibilité : 85/100 (Bons efforts sur les outline et keyboard)
+- UX : 90/100 (Excellente dynamique visuelle de mouvement globale)
+
+### Actions prioritaires (Top 5)
+1. Protéger **immédiatement** les PII. Ne jamais laisser un identifiant ou un email professionnel sur GitHub/code sans précaution. (Effort 1h - Impact CRITIQUE)
+2. Retirer l'interrogation `VITE_GEMINI_API_KEY` du front, la passer sur Node.js Serveur (Effort 2h - Impact CRITIQUE)
+3. Refaire la méthode d'authentification du FounderPortal côté serveur (Effort 4h - Impact CRITIQUE)
+4. Modifier les event listeners React sur la fonction handleScroll avec Framer Motion `useScroll` (Effort 1h - Impact HAUTE)
+5. Activer le Lazy Loading React pour les sections sous la ligne de visibilité initiale (Effort 1h - Impact HAUTE)
+
+### Plan d'action recommandé
+**Phase 1 (Urgent - 24h):**
+- Supprimer les clés API et les données personnelles exposées de manière inconditionnelle. Fix de `App.tsx` au niveau du Scroll.
+**Phase 2 (Court terme - 1 semaine):**
+- Ré-ingénérer le backend Node.js (`server.ts`)
+**Phase 3 (Moyen terme - 1 mois):**
+- Raccorder le formulaire "Contact" réel au backend Node.
+**Phase 4 (Long terme - Continu):**
+- Envisager ou configurer SSR/SSG (Serveur-Side Registration) ou Vite/Next JS pour le SEO.

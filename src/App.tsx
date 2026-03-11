@@ -11,7 +11,7 @@ import { PortfolioFooter } from './components/portfolio/PortfolioFooter';
 import { portfolioTranslations } from './portfolioTranslations';
 import { CustomCursor } from './components/ui/CustomCursor';
 import { Preloader } from './components/ui/Preloader';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { Magnetic } from './components/ui/Magnetic';
 import { ChevronUp } from 'lucide-react';
 
