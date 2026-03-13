@@ -1,0 +1,50 @@
+/* Custom styles and animations for RETROUVO Vitrine */
+
+/* Reveal Animations */
+.reveal {
+    position: relative;
+    transform: translateY(30px);
+    opacity: 0;
+    transition: all 0.8s ease;
+}
+.reveal.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.reveal-left {
+    transform: translateX(-50px);
+}
+.reveal-left.active {
+    transform: translateX(0);
+}
+
+.reveal-right {
+    transform: translateX(50px);
+}
+.reveal-right.active {
+    transform: translateX(0);
+}
+
+/* Nav Links Underline Effect */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0px;
+    left: 50%;
+    background-color: #059669; /* emerald-600 */
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+/* Smooth Scrolling setup handled by Tailwind class 'scroll-smooth' in HTML */
