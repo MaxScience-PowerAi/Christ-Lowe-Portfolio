@@ -26,6 +26,14 @@
     transform: translateX(0);
 }
 
+/* Base styles to hide initially */
+.section {
+    display: none !important;
+}
+.section.active {
+    display: block !important;
+}
+
 /* Nav Links Underline Effect */
 .nav-link {
     position: relative;
