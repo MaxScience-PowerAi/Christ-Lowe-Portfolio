@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://powerai-presentation.com/sitemap.xml
-
-# Block access to API endpoints and admin areas
-Disallow: /api/
